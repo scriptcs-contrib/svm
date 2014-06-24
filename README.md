@@ -40,6 +40,8 @@ svm (scriptcs version manager)
     	use the installed scriptcs version indicated by <version>
     	examples:
     	> svm use 0.10.0
+		
+This work and implementation was inspired by [rbenv](https://github.com/sstephenson/rbenv), [kvm](https://github.com/aspnet/KRuntime/tree/dev/setup) and [nvm](https://github.com/creationix/nvm).
 
 Manual install of svm for now ...
 
