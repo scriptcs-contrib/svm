@@ -1,0 +1,4 @@
+#!/bin/bash
+
+rootpath=~/svm
+echo $2 > $rootpath/version

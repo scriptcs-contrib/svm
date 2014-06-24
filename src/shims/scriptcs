@@ -1,0 +1,5 @@
+#!/bin/bash
+
+rootpath=~/.svm
+version=`cat $rootpath/version`
+mono $rootpath/versions/$version/scriptcs.exe "$@"
