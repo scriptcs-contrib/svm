@@ -8,17 +8,24 @@ param (
   [string[]]$scriptArgs=@()
 )
 
-$scriptPath = $myInvocation.MyCommand.Definition
-
 #$svmVersion = "{{VERSION}}"
 $svmVersion = "0.1.0"
-$svmPath = $env:USERPROFILE + "\.svm"
-$versionsPath = $svmPath + "\versions\"
-$versionFilePath = $svmPath + "\version"
+
+$scriptPath = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition) # \.svm\bin
+$svmPath = [System.IO.Directory]::GetParent($scriptPath).FullName # \.svm\
+$versionsPath = [System.IO.Path]::Combine($svmPath, 'versions')
+$versionFilePath = [System.IO.Path]::Combine($svmPath, 'version')
 
 #
 # helper functions
 #
+function Write-TitleMessage
+{
+  param (
+    [string] $message
+  )
+  Write-Host  $("{0}" -f "`n $message `n") -BackgroundColor DarkGray -ForegroundColor Black
+}
 function Write-InfoMessage
 {
   param (
@@ -44,12 +51,17 @@ function Get-ActiveVersion
   }
 
   $activeVersion = Get-Content $versionFilePath
-  return $activeVersion.Trim()
+  if ($activeVersion -ne [String]::Empty -and $activeVersion -ne $null)
+  {
+    $activeVersion = $activeVersion.Trim()
+  }
+
+  return $activeVersion
 }
 
 function Get-InstalledVersions
 {
-  $versions = @();
+  $versions = @()
 
   if (!(Test-Path $versionsPath))
   {
@@ -91,7 +103,7 @@ function Confirm-ElevatedRole
 #
 # svm commands
 #
-function Svm.Get-Help
+function Svm-Help
 {
 $helpMessage = @"
  USAGE: svm <command> [options]
@@ -133,12 +145,12 @@ $helpMessage = @"
   Write-InfoMessage $helpMessage
 }
 
-function Svm.Get-VersionsAvailableForInstall
+function Svm-InstallList
 {
   Write-ErrorMessage "svm install <-l|-list> - not yet implemented ..."
 }
 
-function Svm.Add-VersionFromPath
+function Svm-InstallVersionFromPath
 {
   param(
     [string] $version,
@@ -147,7 +159,7 @@ function Svm.Add-VersionFromPath
   Write-ErrorMessage "svm install <version> -from <path> - not yet implemented ..."
 }
 
-function Svm.Add-Version
+function Svm-InstallVersion
 {
   param(
     [string] $version
@@ -156,7 +168,7 @@ function Svm.Add-Version
   Write-ErrorMessage "svm install <version> - not yet implemented ..."
 }
 
-function Svm.Remove-Version
+function Svm-RemoveVersion
 {
   param(
     [string] $version
@@ -189,7 +201,7 @@ function Svm.Remove-Version
   }
 }
 
-function Svm.Get-ActiveVersion
+function Svm-ListActive
 {
   $versions = Get-InstalledVersions
   $activeVersion = $versions |? { $_.Active }
@@ -210,7 +222,7 @@ function Svm.Get-ActiveVersion
   }
 }
 
-function Svm.Get-InstalledVersions
+function Svm-List
 {
   $versions = Get-InstalledVersions
 
@@ -228,7 +240,7 @@ function Svm.Get-InstalledVersions
   }
 }
 
-function Svm.Use-Version
+function Svm-UseVersion
 {
   param(
     [string] $version
@@ -254,57 +266,63 @@ function Parse-CommandParameters
 {
   $parsedCommand = [String]::Empty
 
-  if ($command -eq "install")
+  switch ($command)
   {
-    if (-not $active -and -not $list -and [String]::IsNullOrEmpty($from) -and $scriptArgs.Count -eq 1)
-    { $parsedCommand = "install <version>" }
-    if (-not $active -and -not $list -and -not [String]::IsNullOrEmpty($from) -and $scriptArgs.Count -eq 1)
-    { $parsedCommand = "install <version> -from <path>" }
-    if (-not $active -and $list -and [String]::IsNullOrEmpty($from) -and $scriptArgs.Count -eq 0)
-    { $parsedCommand = "install -list" }
-  }
-  elseif ($command -eq "remove")
-  {
-    if (-not $active -and -not $list -and [String]::IsNullOrEmpty($from) -and $scriptArgs.Count -eq 1)
-    { $parsedCommand = "remove <version>" }
-  }
-  elseif ($command -eq "list")
-  {
-    if (-not $active -and -not $list -and [String]::IsNullOrEmpty($from) -and $scriptArgs.Count -eq 0)
-    { $parsedCommand = "list" }
-    elseif ($active)
-    { $parsedCommand = "list -active" }
-  }
-  elseif ($command -eq "use")
-  {
-    if (-not $active -and -not $list -and [String]::IsNullOrEmpty($from) -and $scriptArgs.Count -eq 1)
-    { $parsedCommand = "use <version>" }
-  }
-  elseif ($command -eq "help")
-  {
-    if (-not $active -and -not $list -and [String]::IsNullOrEmpty($from) -and $scriptArgs.Count -eq 0)
-    { $parsedCommand = "help" }
-  }
+    "install"
+    {
+      if (-not $active -and -not $list -and [String]::IsNullOrEmpty($from) -and $scriptArgs.Count -eq 1)
+      { $parsedCommand = "install <version>" }
+      elseif (-not $active -and -not $list -and -not [String]::IsNullOrEmpty($from) -and $scriptArgs.Count -eq 1)
+      { $parsedCommand = "install <version> -from <path>" }
+      elseif (-not $active -and $list -and [String]::IsNullOrEmpty($from) -and $scriptArgs.Count -eq 0)
+      { $parsedCommand = "install -list" }
+    }
 
+    "remove"
+    {
+      if (-not $active -and -not $list -and [String]::IsNullOrEmpty($from) -and $scriptArgs.Count -eq 1)
+      { $parsedCommand = "remove <version>" }
+    }
+
+    "list"
+    {
+      if (-not $active -and -not $list -and [String]::IsNullOrEmpty($from) -and $scriptArgs.Count -eq 0)
+      { $parsedCommand = "list" }
+      elseif ($active)
+      { $parsedCommand = "list -active" }
+    }
+
+    "use"
+    {
+      if (-not $active -and -not $list -and [String]::IsNullOrEmpty($from) -and $scriptArgs.Count -eq 1)
+      { $parsedCommand = "use <version>" }
+    }
+
+    "help"
+    {
+      if (-not $active -and -not $list -and [String]::IsNullOrEmpty($from) -and $scriptArgs.Count -eq 0)
+      { $parsedCommand = "help" }
+    }
+  }
   return $parsedCommand
 }
 
 try
 {
-  Write-Host "`n scriptcs version manager - $svmVersion `n" -BackgroundColor DarkGray -ForegroundColor Black
+  Write-TitleMessage "scriptcs version manager - $svmVersion"
 
   $parsedCommand = Parse-CommandParameters
   switch ($parsedCommand)
   {
-    "install <version>"               {Svm.Add-Version $scriptArgs[0]}
-    "install <version> -from <path>"  {Svm.Add-VersionFromPath $scriptArgs[0] $from}
-    "install -list"                   {Svm.Get-VersionsAvailableForInstall}
-    "remove <version>"                {Svm.Remove-Version $scriptArgs[0]}
-    "list"                            {Svm.Get-InstalledVersions}
-    "list -active"                    {Svm.Get-ActiveVersion}
-    "use <version>"                   {Svm.Use-Version $scriptArgs[0]}
-    "help"                            {Svm.Get-Help}
-    default                           {Svm.Get-Help}
+    "install <version>"               { Svm-InstallVersion $scriptArgs[0] }
+    "install <version> -from <path>"  { Svm-InstallVersionFromPath $scriptArgs[0] $from }
+    "install -list"                   { Svm-InstallList }
+    "remove <version>"                { Svm-RemoveVersion $scriptArgs[0] }
+    "list"                            { Svm-List }
+    "list -active"                    { Svm-ListActive }
+    "use <version>"                   { Svm-UseVersion $scriptArgs[0] }
+    "help"                            { Svm-Help }
+    default                           { Svm-Help }
   }
 }
 catch

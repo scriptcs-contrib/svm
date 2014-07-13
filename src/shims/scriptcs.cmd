@@ -1,5 +1,3 @@
 @echo off
 
-set rootpath=%userprofile%\.svm
-set /p version=<%rootpath%\version
-%rootpath%\versions\%version%\scriptcs.exe %*
+PowerShell -NoProfile -NoLogo -ExecutionPolicy Unrestricted -Command "& '%~dp0scriptcs.ps1' %*"
