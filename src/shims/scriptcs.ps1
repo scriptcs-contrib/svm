@@ -22,6 +22,14 @@ function Write-ErrorMessage
   Write-Host $("{0}" -f "[SVM] $message") -BackgroundColor DarkRed -ForegroundColor White
 }
 
+function String-IsEmptyOrWhitespace
+{
+  param (
+    [string] $str
+  )
+  return [string]::IsNullOrEmpty($str) -or $str.Trim().length -eq 0
+}
+
 function Get-ActiveVersion
 {
   if (!(Test-Path $versionFilePath))
@@ -30,7 +38,7 @@ function Get-ActiveVersion
   }
 
   $activeVersion = Get-Content $versionFilePath
-  if ($activeVersion -ne [String]::Empty -and $activeVersion -ne $null)
+  if (-not String-IsEmptyOrWhitespace($activeVersion))
   {
     $activeVersion = $activeVersion.Trim()
   }
