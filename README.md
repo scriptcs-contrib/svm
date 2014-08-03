@@ -17,8 +17,8 @@ svm (scriptcs version manager)
 	  svm install <version> -from <path>
 	    Install scriptcs version from path <path> as version <version>. Path may be a local folder or a local NuGet package.
 	    examples:
-	    > svm install mybuild-0.10.1 -from C:\scriptcs\bin\Debug\
-	    > svm install 0.10.1 -from C:\Downloads\ScriptCs.0.10.1.nupkg
+	    > svm install mybuild-0.10.1 -from 'C:\scriptcs\bin\Debug'
+    	> svm install 0.10.1 -from 'C:\Downloads\ScriptCs.0.10.1.nupkg'
 	
 	  svm install <-l|-list>
 	    List the scriptcs versions avaiable to install.
