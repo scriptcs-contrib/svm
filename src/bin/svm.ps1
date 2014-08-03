@@ -189,7 +189,7 @@ function Get-ActiveVersion
 {
   if (!(Test-Path $versionFilePath))
   {
-    Write-ErrorMessage "The version file cannot be found at '$($versionFilePath)'."
+    Set-Content -Path $versionFilePath -Force "__NO_ACTIVE_VERSION__"
     return [String]::Empty
   }
 
