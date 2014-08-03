@@ -1,7 +1,7 @@
-$scriptPath = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition) # \.svm\shim
-$svmPath = [System.IO.Directory]::GetParent($scriptPath).FullName # \.svm\
-$versionsPath = [System.IO.Path]::Combine($svmPath, 'versions')
-$versionFilePath = [System.IO.Path]::Combine($svmPath, 'version')
+$scriptPath       = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition)  # \.svm\shim
+$svmPath          = [System.IO.Directory]::GetParent($scriptPath).FullName                  # \.svm\
+$versionsPath     = [System.IO.Path]::Combine($svmPath, 'versions')                         # \.svm\versions
+$versionFilePath  = [System.IO.Path]::Combine($svmPath, 'version')                          # \.svm\version
 
 #
 # helper functions

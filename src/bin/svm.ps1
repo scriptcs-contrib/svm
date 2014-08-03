@@ -11,11 +11,11 @@ param (
 #$svmVersion = "{{VERSION}}"
 $svmVersion = "0.1.0"
 
-$scriptPath = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition)  # \.svm\bin
-$svmPath = [System.IO.Directory]::GetParent($scriptPath).FullName                     # \.svm\
-$tempPath = [System.IO.Path]::Combine($svmPath, 'temp')                               # \.svm\temp
-$versionsPath = [System.IO.Path]::Combine($svmPath, 'versions')                       # \.svm\versions
-$versionFilePath = [System.IO.Path]::Combine($svmPath, 'version')                     # \.svm\version
+$scriptPath       = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition)  # \.svm\bin
+$svmPath          = [System.IO.Directory]::GetParent($scriptPath).FullName                  # \.svm\
+$tempPath         = [System.IO.Path]::Combine($svmPath, 'temp')                             # \.svm\temp
+$versionsPath     = [System.IO.Path]::Combine($svmPath, 'versions')                         # \.svm\versions
+$versionFilePath  = [System.IO.Path]::Combine($svmPath, 'version')                          # \.svm\version
 
 #
 # helper functions
@@ -53,9 +53,8 @@ function String-IsEmptyOrWhitespace
 
 function Get-VersionsAvailableToInstall
 {
-  # TODO replace with call to svm web api (release and nightly versions) ...
+  # TODO replace with call to svm web api (include release and nightly versions) ...
   # currently hard coded list
-
   $versions = @();
 
   $version = New-Object PSObject -Property @{
@@ -93,12 +92,34 @@ function Get-VersionsAvailableToInstall
 
   $version = New-Object PSObject -Property @{
     Version               = "0.10.0"
-    IsLatestVersion       = $true
+    IsLatestVersion       = $false
     PublishedDate         = "2014-07-30T02:22:35.907"
     Platform              = @("Linux", "Mac", "Windows")
     URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.10.0"
     PackageHashAlgorithm  = "SHA512"
     PackageHash           = "ovPmZUIjpXgTcmR+xgVEEJ5O+Lynh50F5RMNHo0WZk4r0Jr9DakU6syhEbEluOQVLZ1em+8UFeOzaLzb0DjMlw=="
+  }
+  $versions += $version
+
+  $version = New-Object PSObject -Property @{
+    Version               = "0.10.1"
+    IsLatestVersion       = $false
+    PublishedDate         = "2014-07-30T22:24:13.01"
+    Platform              = @("Linux", "Mac", "Windows")
+    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.10.1"
+    PackageHashAlgorithm  = "SHA512"
+    PackageHash           = "sn3QtQaBrMZtOKjT2R5SvgEu0RqqFCdG6y2KZ2TSQfxsyk82GbzYgqQMJ4OrsfpmqOlMVHJSArGeZFDOVXAXbQ=="
+  }
+  $versions += $version
+
+  $version = New-Object PSObject -Property @{
+    Version               = "0.10.2"
+    IsLatestVersion       = $true
+    PublishedDate         = "2014-08-01T02:41:53.897"
+    Platform              = @("Linux", "Mac", "Windows")
+    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.10.2"
+    PackageHashAlgorithm  = "SHA512"
+    PackageHash           = "kL//M9qdjSW2frQUD6t9YRfviLsqMt2GtDvvXcZVr8WzpgbPIKeHjgQTj7Wx1r9LfRed2XA2h1t1RTKcP22mbA=="
   }
   $versions += $version
 
@@ -111,8 +132,7 @@ function Get-VersionToInstall
     [string] $version
   )
 
-  # TODO - more robust handling and error checking
-
+  # TODO replace with call to svm web api
   return Get-VersionsAvailableToInstall |? { $_.Version -eq $version }
 }
 
@@ -123,10 +143,7 @@ function Download-ScriptCsNuGetPackage
     [string] $downloadPath
   )
 
-  # TODO - more robust handling and error checking
-
   New-Item $([System.IO.Path]::GetDirectoryName($downloadPath)) -type Directory | Out-Null
-
   $wc = New-Object System.Net.WebClient
   $wc.DownloadFile($url, $downloadPath)
 }
@@ -137,8 +154,6 @@ function Install-ScriptCsFromNuGetPackage
     [string] $packagePath,
     [string] $installPath
   )
-
-  # TODO - add messages
 
   New-Item $installPath -type Directory | Out-Null
 
@@ -153,13 +168,21 @@ function Install-ScriptCsFromNuGetPackage
   $destination = $shellApp.namespace($packageUnzipFolder)
   $destination.CopyHere($zipFile.items(), 0x14) #0x4 = don't show UI, 0x10 = overwrite files
 
+  # Only copy a specific sub folder ( tools\scriptcs\* ) from the .nupkg file into the install folder
   $zipFolderToExtract = [System.IO.Path]::Combine($packageUnzipFolder, 'tools', 'scriptcs', '*')
   Copy-Item -Path $zipFolderToExtract -Recurse -Destination $installPath
 }
 
 function Install-ScriptCsFromFolder
 {
-  # TODO - implement
+  param(
+    [string] $sourcePath,
+    [string] $installPath
+  )
+
+  New-Item $installPath -type Directory | Out-Null
+  $sourceFiles = [System.IO.Path]::Combine($sourcePath, '*')
+  Copy-Item -Path $sourceFiles -Recurse -Destination $installPath
 }
 
 function Get-ActiveVersion
@@ -213,13 +236,6 @@ filter ConvertTo-InstalledVersion
   return $version
 }
 
-function Confirm-ElevatedRole
-{
-  $user = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
-  $elevated = $user.IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
-  return $elevated
-}
-
 #
 # svm commands
 #
@@ -237,8 +253,8 @@ $helpMessage = @"
   svm install <version> -from <path>
     Install scriptcs version from path <path> as version <version>. Path may be a local folder or a local NuGet package.
     examples:
-    > svm install mybuild-0.10.1 -from C:\scriptcs\bin\Debug\
-    > svm install 0.10.1 -from C:\Downloads\ScriptCs.0.10.1.nupkg
+    > svm install mybuild-0.10.1 -from 'C:\scriptcs\bin\Debug'
+    > svm install 0.10.1 -from 'C:\Downloads\ScriptCs.0.10.1.nupkg'
 
   svm install <-l|-list>
     List the scriptcs versions avaiable to install.
@@ -289,7 +305,41 @@ function Svm-InstallVersionFromPath
     [string] $version,
     [string] $path
   )
-  Write-ErrorMessage "svm install <version> -from <path> - not yet implemented ..."
+
+  $version = $version.Trim()
+  $installPath = [System.IO.Path]::Combine($versionsPath, $version)
+  if (Test-Path $installPath)
+  {
+    Write-ErrorMessage "Version '$($version)' is already installed in versions folder '$($versionsPath)'."
+    return
+  }
+
+  if (Test-Path -Path $path -PathType container)
+  {
+    Write-InfoMessage "Installing version '$version'."
+    Install-ScriptCsFromFolder -sourcePath $path -installPath $installPath
+  }
+  elseif ([System.IO.Path]::GetExtension($path) -eq ".nupkg")
+  {
+    $nugetPackage = [System.IO.Path]::GetFileName($path)
+    $workingPath = [System.IO.Path]::Combine($tempPath, [Guid]::NewGuid())
+    $nuGetPackagePath = [System.IO.Path]::Combine($workingPath, $nugetPackage)
+
+    New-Item $workingPath -type Directory | Out-Null
+    Copy-Item -Path $path -Destination $nuGetPackagePath
+
+    Write-InfoMessage "Installing version '$version'."
+    Install-ScriptCsFromNuGetPackage -packagePath $nuGetPackagePath -installPath $installPath
+    Remove-Item -Recurse -Force $workingPath
+  }
+  else
+  {
+    Write-ErrorMessage "Unrecognised option specified for the path."
+    return
+  }
+
+  Write-InfoMessage "Version '$version' is now available."
+  Write-InfoMessage "Consider using svm use <version> to set it as the active scriptcs version."
 }
 
 function Svm-InstallVersion
@@ -298,6 +348,7 @@ function Svm-InstallVersion
     [string] $version
   )
 
+  $version = $version.Trim()
   $installPath = [System.IO.Path]::Combine($versionsPath, $version)
   if (Test-Path $installPath)
   {
@@ -310,11 +361,11 @@ function Svm-InstallVersion
   Write-InfoMessage "Downloading version '$version' from '$($installVersion.URL)'."
   $nugetPackage = 'ScriptCs.{0}.nupkg' -f $version
   $downloadPath = [System.IO.Path]::Combine($tempPath, [Guid]::NewGuid())
-  $downloadNuGetPackagePath = [System.IO.Path]::Combine($downloadPath, $nugetPackage)
-  Download-ScriptCsNuGetPackage -url $installVersion.URL -downloadPath $downloadNuGetPackagePath
+  $nuGetPackagePath = [System.IO.Path]::Combine($downloadPath, $nugetPackage)
+  Download-ScriptCsNuGetPackage -url $installVersion.URL -downloadPath $nuGetPackagePath
 
   Write-InfoMessage "Installing version '$version'."
-  Install-ScriptCsFromNuGetPackage -packagePath $downloadNuGetPackagePath -installPath $installPath
+  Install-ScriptCsFromNuGetPackage -packagePath $nuGetPackagePath -installPath $installPath
   Remove-Item -Recurse -Force $downloadPath
 
   Write-InfoMessage "Version '$version' is now available."
