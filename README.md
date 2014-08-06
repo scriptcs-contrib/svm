@@ -44,42 +44,17 @@ svm (scriptcs version manager)
 
 This work and implementation was inspired by [rbenv](https://github.com/sstephenson/rbenv), [kvm](https://github.com/aspnet/KRuntime/tree/dev/setup) and [nvm](https://github.com/creationix/nvm).
 
-Manual install of svm for now ...
-
 ## Windows ##
 
-This version is close to complete now.
+### Install ###
 
-### Install and configure svm ###
+The easiest way to obtain `svm` is to run the following command in a command prompt:
 
-Create the following folder:
-
-`mkdir %userprofile%\.svm`
-
-Copy the `src` folder of the git repo to the `.svm` folder.
-
-You should have something like the following folder structure:
-
-
-    bin\
-      svm.cmd
-      svm.ps1
-
-    shims\
-      scriptcs.cmd
-      scriptcs.ps1
-
-    versions\
-
-    version
-
-Set the PATH as follows:
-
-	Path=%userprofile%\.svm\bin;%userprofile%\.svm\shims;%Path%
+	@powershell -NoProfile -ExecutionPolicy unrestricted -Command "iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/paulbouwer/svm/master/install/installer.ps1'))"
 
 ### Start using ###
 
-Start a command prompt and type the following:
+Start a new command prompt after installing and type the following to get started:
 
 	svm help
 
@@ -112,6 +87,8 @@ This should work on OS X and Linux. I have tested on Ubuntu so far. You will nee
 
 
 ### Install and configure svm ###
+
+This is manual for now ...
 
 Create the following folder:
 
