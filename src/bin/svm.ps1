@@ -159,7 +159,7 @@ function Install-ScriptCsFromNuGetPackage
 
   $packageZip = [System.IO.Path]::ChangeExtension($packagePath, "zip")
   Rename-Item $packagePath $packageZip
-  $packageUnzipFolder = [System.IO.Path]::ChangeExtension($packagePath, $null)
+  $packageUnzipFolder = [System.IO.Path]::ChangeExtension($packagePath, $null).TrimEnd('.')
   New-Item $packageUnzipFolder -type Directory | Out-Null
 
   # Use the shell to uncompress the zip file
@@ -208,8 +208,7 @@ function Get-InstalledVersions
 
   if (!(Test-Path $versionsPath))
   {
-    Write-ErrorMessage "The versions folder cannot be found at '$($versionsPath)'."
-    return $versions
+    return @()
   }
 
   $activeVersion = Get-ActiveVersion

@@ -38,7 +38,7 @@ function Get-ActiveVersion
   }
 
   $activeVersion = Get-Content $versionFilePath
-  if (-not String-IsEmptyOrWhitespace($activeVersion))
+  if (!(String-IsEmptyOrWhitespace($activeVersion)))
   {
     $activeVersion = $activeVersion.Trim()
   }
