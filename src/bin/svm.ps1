@@ -9,7 +9,7 @@ param (
 )
 
 #$svmVersion = "{{VERSION}}"
-$svmVersion = "0.1.0"
+$svmVersion = "0.2.0"
 
 $scriptPath       = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition)  # \.svm\bin
 $svmPath          = [System.IO.Directory]::GetParent($scriptPath).FullName                  # \.svm\
@@ -241,7 +241,7 @@ filter ConvertTo-InstalledVersion
 function Svm-Help
 {
 $helpMessage = @"
- USAGE: svm <command> [options]
+  USAGE: svm <command> [options]
 
   svm install <version>
     Install scriptcs version indicated by <version>.

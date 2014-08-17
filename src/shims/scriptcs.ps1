@@ -6,6 +6,7 @@ $versionFilePath  = [System.IO.Path]::Combine($svmPath, 'version')              
 #
 # helper functions
 #
+
 function Write-InfoMessage
 {
   param (
@@ -55,10 +56,14 @@ function Get-ScriptCsExecutable
   return $scriptcs
 }
 
+#
+# shim
+#
+
 try
 {
   $version = Get-ActiveVersion
-  if ($version -eq [String]::Empty -or $version -eq $null)
+  if (String-IsEmptyOrWhitespace($version))
   {
     Write-ErrorMessage "No active scriptcs found. Use 'svm use <version>' to set the active scriptcs version."
     exit
