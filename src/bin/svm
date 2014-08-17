@@ -1,4 +1,79 @@
 #!/bin/bash
 
-rootpath=~/svm
-echo $2 > $rootpath/version
+#SVM_VERSION="{{VERSION}}"
+SVM_VERSION="0.2.0"
+
+SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"     # /.svm/bin
+SVM_PATH=${SCRIPT_PATH%/shims}                                      # /.svm/
+TEMP_PATH="$SVM_PATH/versions"                                      # /.svm/temp
+VERSIONS_PATH="$SVM_PATH/versions"                                  # /.svm/versions
+VERSION_FILE_PATH="$SVM_PATH/version"                               # /.svm/version
+
+#
+# helper functions
+#
+
+_svm_title_message() {
+  local message="$1"
+  echo -e "\n\e[1;4m $message \e[0m"
+}
+_svm_info_message() {
+  local message="$1"
+  echo -e " $message "
+}
+_svm_error_message() {
+  local message="$1"
+  echo -e "\e[41m $message \e[0m"
+}
+
+#
+# svm commands
+#
+
+_svm_help() {
+  echo ""
+  echo "  USAGE: svm <command> [options]"
+  echo ""
+  echo "  svm install <version>"
+  echo "    Install scriptcs version indicated by <version>."
+  echo "    examples:"
+  echo "    > svm install 0.10.0"
+  echo "    > svm install 0.10.1"
+  echo ""
+  echo "  svm install <version> -from <path>"
+  echo "    Install scriptcs version from path <path> as version <version>. Path may be a local folder or a local NuGet package."
+  echo "    examples:"
+  echo "    > svm install mybuild-0.10.2 -from '/tmp/scriptcs/build'"
+  echo "    > svm install 0.10.2 -from '/tmp/downloads/ScriptCs.0.10.2.nupkg'"
+  echo ""
+  echo "  svm install <-l|-list>"
+  echo "    List the scriptcs versions avaiable to install."
+  echo "    examples:"
+  echo "    > svm install -l"
+  echo ""
+  echo "  svm remove <version>"
+  echo "    Remove installed scriptcs version indicated by <version>."
+  echo "    examples:"
+  echo "    > svm remove 0.10.0"
+  echo ""
+  echo "  svm list [-a|-active]"
+  echo "    List the installed scriptcs versions."
+  echo "    -a|-active       list the active version"
+  echo "    examples:"
+  echo "    > svm list"
+  echo "    > svm list -a"
+  echo ""
+  echo "  svm use <version>"
+  echo "    Use the installed scriptcs version indicated by <version>."
+  echo "    examples:"
+  echo "    > svm use 0.10.2"
+  echo ""
+  echo ""
+}
+
+#
+# command switching
+#
+
+_svm_title_message "scriptcs version manager - $SVM_VERSION"
+_svm_help
