@@ -4,7 +4,7 @@
 SVM_VERSION="0.2.0"
 
 SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"     # /.svm/bin
-SVM_PATH=${SCRIPT_PATH%/shims}                                      # /.svm/
+SVM_PATH=${SCRIPT_PATH%/bin}                                        # /.svm/
 TEMP_PATH="$SVM_PATH/versions"                                      # /.svm/temp
 VERSIONS_PATH="$SVM_PATH/versions"                                  # /.svm/versions
 VERSION_FILE_PATH="$SVM_PATH/version"                               # /.svm/version
@@ -15,7 +15,7 @@ VERSION_FILE_PATH="$SVM_PATH/version"                               # /.svm/vers
 
 _svm_title_message() {
   local message="$1"
-  echo -e "\n\e[1;4m $message \e[0m"
+  echo -e "\n\e[1;4m $message \e[0m\n"
 }
 _svm_info_message() {
   local message="$1"
@@ -26,12 +26,49 @@ _svm_error_message() {
   echo -e "\e[41m $message \e[0m"
 }
 
+_svm_trim_string() {
+  local string="$1"
+  string="${string##*( )}" # trim leading whitespace
+  string="${string%%*( )}" # trim trailing whitespace
+  echo $string
+}
+
+_svm_get_active_version() {
+  local activeVersion=""
+
+  if [ ! -f "$VERSION_FILE_PATH" ];
+  then
+    echo -n "__NO_ACTIVE_VERSION__" > $VERSION_FILE_PATH
+  else
+    activeVersion=`cat $VERSION_FILE_PATH`
+    activeVersion=$(_svm_trim_string "$activeVersion")
+  fi
+
+  echo $activeVersion
+}
+
+_svm_get_installed_versions() {
+  local versions=()
+  local activeVersion=""
+
+  if [ -d "$VERSIONS_PATH" ]; then
+    activeVersion=$(_svm_get_active_version)
+
+    local installed_versions=(`ls "$VERSIONS_PATH"`)
+    for installed_version in ${installed_versions[@]}; do
+      [[ "$activeVersion" == "$installed_version" ]] && active="true" || active="false"
+      versions+=("$active|$installed_version|$VERSIONS_PATH/$installed_version")
+    done
+  fi
+
+  echo ${versions[@]}
+}
+
 #
 # svm commands
 #
 
 _svm_help() {
-  echo ""
   echo "  USAGE: svm <command> [options]"
   echo ""
   echo "  svm install <version>"
@@ -67,8 +104,28 @@ _svm_help() {
   echo "    Use the installed scriptcs version indicated by <version>."
   echo "    examples:"
   echo "    > svm use 0.10.2"
-  echo ""
-  echo ""
+}
+
+_svm_use_version() {
+  local version="$1"
+  local versionInstalled=0
+
+  version=$(_svm_trim_string "$version")
+  local installed_versions=($(_svm_get_installed_versions))
+  for installed_version in "${installed_versions[@]}"; do
+    if [ `echo $installed_version | cut -d'|' -f2` == "$version" ]; then
+      versionInstalled=1
+    fi
+  done
+
+  if [ $versionInstalled -eq "1" ];
+  then
+    echo "$version" > $VERSION_FILE_PATH
+    _svm_info_message "Active scriptcs version set to '$version'."
+  else
+    _svm_error_message "Version '$version' cannot be found in versions folder '$VERSIONS_PATH'."
+    _svm_error_message "Consider using svm install <version> to install the scriptcs version."
+  fi
 }
 
 #
@@ -76,4 +133,33 @@ _svm_help() {
 #
 
 _svm_title_message "scriptcs version manager - $SVM_VERSION"
-_svm_help
+
+if [ $# -lt 1 ];
+then
+
+  _svm_help
+
+else
+
+  case $1 in
+
+    "help" )
+      _svm_help
+    ;;
+
+    "use" )
+      # svm use <version>
+      [[ $# -ne 2 ]] && _svm_help && echo "" && exit
+
+      version="$2"
+      _svm_use_version "$version"
+    ;;
+
+    *)
+      _svm_help
+
+  esac
+
+fi
+
+echo ""
