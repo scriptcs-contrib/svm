@@ -63,7 +63,11 @@ Start a new command prompt after installing and type the following to get starte
 
 This should work on OS X and Linux. I have tested on Ubuntu so far. You will need mono installed.
 
-### Building mono 3.4.0 from a tarball on Ubuntu 14.04 ###
+### Prerequisites ###
+
+#### mono ####
+
+Building mono 3.4.0 from a tarball on Ubuntu 14.04
 
 	$ mkdir /tmp/scriptcs
 	$ cd /tmp/scriptcs
@@ -85,7 +89,12 @@ This should work on OS X and Linux. I have tested on Ubuntu so far. You will nee
 	$ make
 	$ sudo make install
 
+#### packages ####
 
+**unzip**
+
+	sudo apt-get -y install unzip
+ 
 ### Install and configure svm ###
 
 This is manual for now ...
@@ -126,19 +135,14 @@ Set correct file attributes as follows:
 
 ### Install scriptcs versions manually for now. ###
 
-Download `0.9.0` version of nupkg from:
+Download `0.10.2` version of nupkg:
 
-	https://chocolateypackages.s3.amazonaws.com/ScriptCs.0.9.0.nupkg
-
-And `0.10.0-alpha.140612` from:
-
-	https://www.myget.org/F/scriptcsnightly/api/v2/package/scriptcs/0.10.0-alpha-140612
+	curl http://chocolatey.org/api/v2/package/ScriptCs/0.10.2 -L -o ScriptCs.0.10.2.nupkg
 
 Change `.nupkg` extensions to`.zip`, unzip files and place contents of `tools\scriptcs` folder into the `.svm\versions\` folder. It should look something like the following now:
 
 	versions\
-		0.9.0\
-		0.10.0-alpha-140612\
+		0.10.2
 
 ### Start using ###
 
@@ -146,4 +150,8 @@ Type the following in a terminal:
 
 	svm help
 
-The *nix version is a proof of concept currently and not implemented beyond an assumed `svm use <version>` implementation.
+The *nix version currently implements the following commands:
+
+	svm use <version>
+	svm list [-a|-active]
+	svm remove <version>

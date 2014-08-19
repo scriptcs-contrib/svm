@@ -34,29 +34,29 @@ _svm_trim_string() {
 }
 
 _svm_get_active_version() {
-  local activeVersion=""
+  local active_version=""
 
   if [ ! -f "$VERSION_FILE_PATH" ];
   then
     echo -n "__NO_ACTIVE_VERSION__" > $VERSION_FILE_PATH
   else
-    activeVersion=`cat $VERSION_FILE_PATH`
-    activeVersion=$(_svm_trim_string "$activeVersion")
+    active_version=`cat $VERSION_FILE_PATH`
+    active_version=$(_svm_trim_string "$active_version")
   fi
 
-  echo $activeVersion
+  echo $active_version
 }
 
 _svm_get_installed_versions() {
   local versions=()
-  local activeVersion=""
+  local active_version=""
 
   if [ -d "$VERSIONS_PATH" ]; then
-    activeVersion=$(_svm_get_active_version)
+    active_version=$(_svm_get_active_version)
 
     local installed_versions=(`ls "$VERSIONS_PATH"`)
     for installed_version in ${installed_versions[@]}; do
-      [[ "$activeVersion" == "$installed_version" ]] && active="true" || active="false"
+      [[ "$active_version" == "$installed_version" ]] && active="true" || active="false"
       versions+=("$active|$installed_version|$VERSIONS_PATH/$installed_version")
     done
   fi
@@ -94,7 +94,7 @@ _svm_help() {
   echo "    > svm remove 0.10.0"
   echo ""
   echo "  svm list [-a|-active]"
-  echo "    List the installed scriptcs versions."
+    echo "    List the installed scriptcs versions."
   echo "    -a|-active       list the active version"
   echo "    examples:"
   echo "    > svm list"
@@ -106,19 +106,98 @@ _svm_help() {
   echo "    > svm use 0.10.2"
 }
 
+_svm_remove_version() {
+  local version="$1"
+  local installed_versions=()
+  local is_version_installed=0
+  local version_location=""
+
+  version=$(_svm_trim_string "$version")
+  installed_versions=($(_svm_get_installed_versions))
+  for installed_version in "${installed_versions[@]}"; do
+    if [ `echo $installed_version | cut -d'|' -f2` == "$version" ]; then
+      is_version_installed=1
+      version_location=`echo $installed_version | cut -d'|' -f3`
+    fi
+  done
+
+  if [ $is_version_installed -eq "1" ]
+  then
+     if [[ $version_location == $VERSIONS_PATH* ]]; then rm -fr $version_location; fi # remove version with safety check that path starts with version folder
+    _svm_info_message "The scriptcs version '$version' has been removed from versions folder '$VERSIONS_PATH'."
+
+    installed_versions=($(_svm_get_installed_versions))
+    if [ ${#installed_versions[@]} -gt 0 ]; then
+      version=`echo ${installed_version[0]} | cut -d'|' -f2`
+      echo "$version" > $VERSION_FILE_PATH
+      _svm_info_message "The active scriptcs version has been set to '$version'."
+    else
+      echo "__NO_ACTIVE_VERSION__" > $VERSION_FILE_PATH
+      _svm_info_message "No scriptcs versions left installed."
+    fi
+  else
+    _svm_error_message "No scriptcs version $version available to remove."
+  fi
+}
+
+_svm_list() {
+  local installed_versions=()
+
+  installed_versions=($(_svm_get_installed_versions))
+  if [ ${#installed_versions[@]} -gt 0 ]; then
+    local format_string="  %1s  %s\n"
+    local active=""
+    local version=""
+
+    _svm_info_message "The following scriptcs versions are installed:\n"
+    for installed_version in "${installed_versions[@]}"; do
+      active=`echo $installed_version | cut -d'|' -f1`
+      [[ "$active" == "true" ]] && active="*" || active=" "
+      version=`echo $installed_version | cut -d'|' -f2`
+      printf "$format_string" "$active" "$version"
+    done
+  else
+    _svm_info_message "No scriptcs versions found."
+    _svm_info_message "\n Consider using svm install <version> to install a scriptcs version."
+  fi
+}
+
+_svm_list_active() {
+  local installed_versions=()
+  local active_version=""
+
+  installed_versions=($(_svm_get_installed_versions))
+  for installed_version in "${installed_versions[@]}"; do
+    if [ `echo $installed_version | cut -d'|' -f1` == "true" ]; then
+      active_version=`echo $installed_version | cut -d'|' -f2`
+    fi
+  done
+
+  if [[ $active_version == "" && ${#installed_versions[@]} -gt 1 ]]; then
+    _svm_info_message "No active scriptcs version found."
+    _svm_info_message "\n Consider using svm use <version> to set the active scriptcs version."
+  elif [[ $active_version == "" && ${#installed_versions[@]} -eq 0 ]]; then
+    _svm_info_message "No scriptcs versions found."
+    _svm_info_message "\n Consider using svm install <version> to install a scriptcs version."
+  else
+    _svm_info_message "The following is the active scriptcs version:\n"
+    _svm_info_message "  $active_version"
+  fi
+}
+
 _svm_use_version() {
   local version="$1"
-  local versionInstalled=0
+  local is_version_installed=0
 
   version=$(_svm_trim_string "$version")
   local installed_versions=($(_svm_get_installed_versions))
   for installed_version in "${installed_versions[@]}"; do
     if [ `echo $installed_version | cut -d'|' -f2` == "$version" ]; then
-      versionInstalled=1
+      is_version_installed=1
     fi
   done
 
-  if [ $versionInstalled -eq "1" ];
+  if [ $is_version_installed -eq "1" ]
   then
     echo "$version" > $VERSION_FILE_PATH
     _svm_info_message "Active scriptcs version set to '$version'."
@@ -144,7 +223,27 @@ else
   case $1 in
 
     "help" )
+      # svm help
       _svm_help
+    ;;
+
+    "remove" )
+      # svm remove <version>
+      [[ $# -ne 2 ]] && _svm_help && echo "" && exit
+      version="$2"
+      _svm_remove_version "$version"
+    ;;
+
+    "list" )
+      # svm list
+      # svm list [-a|-active 
+      if [ $# -eq 1 ]; then
+        _svm_list
+      elif [[ $# -eq 2 && ( $2 == "-a" || $2 == "-active" ) ]]; then
+        _svm_list_active
+      else
+        _svm_help && echo "" && exit
+      fi
     ;;
 
     "use" )
