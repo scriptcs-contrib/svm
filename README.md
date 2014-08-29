@@ -42,7 +42,7 @@ svm (scriptcs version manager)
 	    examples:
 	    > svm use 0.10.0
 
-This work and implementation was inspired by [rbenv](https://github.com/sstephenson/rbenv), [kvm](https://github.com/aspnet/KRuntime/tree/dev/setup) and [nvm](https://github.com/creationix/nvm).
+This work and implementation was inspired by [__rbenv__](https://github.com/sstephenson/rbenv), [rvm](https://github.com/wayneeseguin/rvm), [kvm](https://github.com/aspnet/KRuntime/tree/dev/setup) and [nvm](https://github.com/creationix/nvm).
 
 ## Windows ##
 
@@ -82,7 +82,7 @@ Building mono 3.4.0 from a tarball on Ubuntu 14.04
 	  <Import Project=".\Microsoft.Portable.Core.props" />
 	  <Import Project=".\Microsoft.Portable.Core.targets" />
 	</Project>
-	-- CTL D --
+	-- CTRL + D --
 
 	$ sudo apt-get -y install autoconf make gcc g++ gettext
 	$ ./configure --prefix=/usr/local
