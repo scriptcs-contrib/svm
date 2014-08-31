@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"						# /.svm/shims
+SCRIPT_PATH="${BASH_SOURCE[0]%/*}"                                  			# /.svm/shims
 SVM_PATH=${SCRIPT_PATH%/shims}																						# /.svm/
 VERSIONS_PATH="$SVM_PATH/versions"																				# /.svm/versions
 VERSION_FILE_PATH="$SVM_PATH/version"																			# /.svm/version

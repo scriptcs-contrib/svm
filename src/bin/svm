@@ -3,7 +3,7 @@
 #SVM_VERSION="{{VERSION}}"
 SVM_VERSION="0.2.0"
 
-SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"     # /.svm/bin
+SCRIPT_PATH="${BASH_SOURCE[0]%/*}"                                  # /.svm/bin
 SVM_PATH=${SCRIPT_PATH%/bin}                                        # /.svm/
 TEMP_PATH="$SVM_PATH/temp"                                          # /.svm/temp
 VERSIONS_PATH="$SVM_PATH/versions"                                  # /.svm/versions
