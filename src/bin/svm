@@ -5,7 +5,7 @@ SVM_VERSION="0.2.0"
 
 SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"     # /.svm/bin
 SVM_PATH=${SCRIPT_PATH%/bin}                                        # /.svm/
-TEMP_PATH="$SVM_PATH/versions"                                      # /.svm/temp
+TEMP_PATH="$SVM_PATH/temp"                                          # /.svm/temp
 VERSIONS_PATH="$SVM_PATH/versions"                                  # /.svm/versions
 VERSION_FILE_PATH="$SVM_PATH/version"                               # /.svm/version
 
@@ -33,11 +33,95 @@ _svm_trim_string() {
   echo $string
 }
 
+_svm_get_versions_available_to_install() {
+  local versions=()
+
+  # TODO replace with call to svm web api (include release and nightly versions) ...
+
+  # Format: Version|PublishedDate|URL
+  versions+=("0.10.0|2014-07-30T02:22:35.907|http://chocolatey.org/api/v2/package/ScriptCs/0.10.0")
+  versions+=("0.10.1|2014-07-30T22:24:13.01|http://chocolatey.org/api/v2/package/ScriptCs/0.10.1")
+  versions+=("0.10.2|2014-08-01T02:41:53.897|http://chocolatey.org/api/v2/package/ScriptCs/0.10.2")
+
+  echo ${versions[@]}
+}
+_svm_parse_version_from_versionsavailabletoinstall_record() {
+  local record="$1"
+  echo `echo $record | cut -d'|' -f1`
+}
+_svm_parse_publishdate_from_versionsavailabletoinstall_record() {
+  local record="$1"
+  echo `echo $record | cut -d'|' -f2`
+}
+_svm_parse_url_from_versionsavailabletoinstall_record() {
+  local record="$1"
+  echo `echo $record | cut -d'|' -f3`
+}
+
+_svm_get_installversion_info() {
+  local version="$1"
+  local version_info=""
+
+  # TODO replace with call to svm web api
+
+  install_versions=($(_svm_get_versions_available_to_install))
+  if [ ${#install_versions[@]} -gt 0 ]; then
+    for install_version_info in "${install_versions[@]}"; do
+      local record_version=$(_svm_parse_version_from_versionsavailabletoinstall_record "$install_version_info")
+      if [ $record_version == $version ]; then
+        version_info="$install_version_info"
+        break
+      fi
+    done
+  fi
+
+  echo $version_info
+}
+_svm_parse_version_from_installversioninfo_record() {
+  local record="$1"
+  echo `echo $record | cut -d'|' -f1`
+}
+_svm_parse_publishdate_from_installversioninfo_record() {
+  local record="$1"
+  echo `echo $record | cut -d'|' -f2`
+}
+_svm_parse_url_from_installversioninfo_record() {
+  local record="$1"
+  echo `echo $record | cut -d'|' -f3`
+}
+
+_svm_download_scriptcs_nugetpackage() {
+  local url="$1"
+  local download_path="$2"
+
+  local httpResult=$(curl -D - -L --create-dirs -o "$download_path" "$url" 2>/dev/null | grep "^HTTP/1.1" | tail -n 1 | sed "s/HTTP.1.1 \([0-9]*\).*/\1/")
+  if [ $httpResult != "200" ];then
+    _svm_error_message "The NuGet package could not be downloaded from '$url'."
+    echo "" && exit
+  fi
+}
+
+_svm_install_scriptcs_from_nugetpackage() {
+  local package_path="$1"
+  local install_path="$2"
+
+  local package_zip="${package_path%.nupkg}.zip"
+  mv "$package_path" "$package_zip"
+  unzip -j "$package_zip" "tools/scriptcs/*" -d "$install_path" > /dev/null 2>&1
+}
+
+_svm_install_scriptcs_from_folder() {
+  local source_path="$1"
+  local install_path="$2"
+
+  mkdir "$install_path"
+  cp -fR "$source_path/." "$install_path"
+}
+
 _svm_get_active_version() {
   local active_version=""
 
-  if [ ! -f "$VERSION_FILE_PATH" ];
-  then
+  if [ ! -f "$VERSION_FILE_PATH" ]; then
     echo -n "__NO_ACTIVE_VERSION__" > $VERSION_FILE_PATH
   else
     active_version=`cat $VERSION_FILE_PATH`
@@ -57,12 +141,26 @@ _svm_get_installed_versions() {
     local installed_versions=(`ls "$VERSIONS_PATH"`)
     for installed_version in ${installed_versions[@]}; do
       [[ "$active_version" == "$installed_version" ]] && active="true" || active="false"
+      # Format: Active|Version|InstalledPath
       versions+=("$active|$installed_version|$VERSIONS_PATH/$installed_version")
     done
   fi
 
   echo ${versions[@]}
 }
+_svm_parse_active_from_installedversions_record() {
+  local record="$1"
+  echo `echo $record | cut -d'|' -f1`
+}
+_svm_parse_version_from_installedversions_record() {
+  local record="$1"
+  echo `echo $record | cut -d'|' -f2`
+}
+_svm_parse_installedpath_from_installedversions_record() {
+  local record="$1"
+  echo `echo $record | cut -d'|' -f3`
+}
+
 
 #
 # svm commands
@@ -94,7 +192,7 @@ _svm_help() {
   echo "    > svm remove 0.10.0"
   echo ""
   echo "  svm list [-a|-active]"
-    echo "    List the installed scriptcs versions."
+  echo "    List the installed scriptcs versions."
   echo "    -a|-active       list the active version"
   echo "    examples:"
   echo "    > svm list"
@@ -106,34 +204,145 @@ _svm_help() {
   echo "    > svm use 0.10.2"
 }
 
+_svm_install_list() {
+  local install_versions=()
+
+  install_versions=($(_svm_get_versions_available_to_install))
+  if [ ${#install_versions[@]} -gt 0 ]; then
+    local format_string="  %s\n"
+    local record_version=""
+
+    _svm_info_message "The following scriptcs versions are available for installation:\n"
+    for install_version in "${install_versions[@]}"; do
+      record_version=$(_svm_parse_version_from_versionsavailabletoinstall_record "$install_version")
+      printf "$format_string" "$record_version"
+    done
+  else
+    _svm_info_message "No scriptcs versions could be found to install."
+  fi
+
+}
+
+_svm_install_version() {
+  local version="$1"
+  local install_path=""
+
+  version=$(_svm_trim_string "$version")
+  install_path="$VERSIONS_PATH/$version"
+
+  if [ ! -d "$install_path" ]; then
+    local install_version_info=""
+    local record_url=""
+    local nuget_package=""
+    local download_path=""
+    local nuget_package_path=""
+
+    install_version_info=$(_svm_get_installversion_info "$version")
+    record_url=$(_svm_parse_url_from_installversioninfo_record "$install_version_info")
+
+    _svm_info_message "Downloading version '$version' from '$record_url'."
+    nuget_package="ScriptCs.$version.nupkg"
+    download_path="$TEMP_PATH/`uuidgen`"
+    nuget_package_path="$download_path/$nuget_package"
+    _svm_download_scriptcs_nugetpackage "$record_url" "$nuget_package_path"
+
+    _svm_info_message "Installing version '$version'."
+    _svm_install_scriptcs_from_nugetpackage "$nuget_package_path" "$install_path"
+    # remove download folder - with safety check that path starts with temp folder
+    if [[ $download_path == $TEMP_PATH* ]]; then rm -fr $download_path; fi
+    _svm_info_message "Version '$version' is now available."
+    _svm_info_message "Consider using svm use <version> to set it as the active scriptcs version."
+
+  else
+    _svm_error_message "Version '$version' is already installed in versions folder '$VERSIONS_PATH'."
+  fi
+}
+
+_svm_install_version_from_path() {
+  local version="$1"
+  local source_path="$2"
+  local file_name=""
+  local file_extension=""
+  local install_path=""
+
+  file_name="${source_path##*/}"
+  file_extension="${file_name##*.}"
+  file_name="${file_name%.*}"
+
+  version=$(_svm_trim_string "$version")
+  install_path="$VERSIONS_PATH/$version"
+
+  if [ ! -d "$install_path" ]; then
+
+    if [ -d "$source_path" ]; then
+      _svm_info_message "Obtaining version '$version' from '$source_path'."
+      _svm_info_message "Installing version '$version'."
+      _svm_install_scriptcs_from_folder "$source_path" "$install_path"
+
+    elif [ $file_extension == "nupkg" ]; then
+      local nuget_package=""
+      local working_path=""
+      local nuget_package_path=""
+
+      nuget_package=$file_name
+      working_path="$TEMP_PATH/`uuidgen`"
+      nuget_package_path="$working_path/$nuget_package"
+
+      _svm_info_message "Obtaining version '$version' from '$source_path'."
+      mkdir "$working_path"
+      cp -fR "$source_path" "$nuget_package_path"
+
+      _svm_info_message "Installing version '$version'."
+      _svm_install_scriptcs_from_nugetpackage "$nuget_package_path" "$install_path"
+      # remove working folder - with safety check that path starts with temp folder
+      if [[ $working_path == $TEMP_PATH* ]]; then rm -fr $working_path; fi
+
+    else
+      _svm_error_message "Unrecognised option specified for the path."
+    fi
+
+    _svm_info_message "Version '$version' is now available."
+    _svm_info_message "Consider using svm use <version> to set it as the active scriptcs version."
+
+  else
+    _svm_error_message "Version '$version' is already installed in versions folder '$VERSIONS_PATH'."
+  fi
+}
+
 _svm_remove_version() {
   local version="$1"
   local installed_versions=()
   local is_version_installed=0
-  local version_location=""
+  local record_version=""
+  local record_location=""
 
   version=$(_svm_trim_string "$version")
   installed_versions=($(_svm_get_installed_versions))
   for installed_version in "${installed_versions[@]}"; do
-    if [ `echo $installed_version | cut -d'|' -f2` == "$version" ]; then
+    record_version=$(_svm_parse_version_from_installedversions_record "$installed_version")
+    if [ "$record_version" == "$version" ]; then
       is_version_installed=1
-      version_location=`echo $installed_version | cut -d'|' -f3`
+      record_location=$(_svm_parse_installedpath_from_installedversions_record "$installed_version")
+      break
     fi
   done
 
   if [ $is_version_installed -eq "1" ]
   then
-     if [[ $version_location == $VERSIONS_PATH* ]]; then rm -fr $version_location; fi # remove version with safety check that path starts with version folder
+    # remove version folder - with safety check that path starts with version folder
+    if [[ $record_location == $VERSIONS_PATH* ]]; then rm -fr $record_location; fi
     _svm_info_message "The scriptcs version '$version' has been removed from versions folder '$VERSIONS_PATH'."
 
     installed_versions=($(_svm_get_installed_versions))
     if [ ${#installed_versions[@]} -gt 0 ]; then
-      version=`echo ${installed_version[0]} | cut -d'|' -f2`
-      echo "$version" > $VERSION_FILE_PATH
-      _svm_info_message "The active scriptcs version has been set to '$version'."
+      record_version=$(_svm_parse_version_from_installedversions_record "${installed_versions[0]}")
+      echo "$record_version" > $VERSION_FILE_PATH
+      _svm_info_message "The active scriptcs version has been set to '$record_version'."
+
     else
       echo "__NO_ACTIVE_VERSION__" > $VERSION_FILE_PATH
       _svm_info_message "No scriptcs versions left installed."
+
     fi
   else
     _svm_error_message "No scriptcs version $version available to remove."
@@ -147,14 +356,16 @@ _svm_list() {
   if [ ${#installed_versions[@]} -gt 0 ]; then
     local format_string="  %1s  %s\n"
     local active=""
-    local version=""
+    local record_active=""
+    local record_version=""
 
     _svm_info_message "The following scriptcs versions are installed:\n"
     for installed_version in "${installed_versions[@]}"; do
       active=`echo $installed_version | cut -d'|' -f1`
-      [[ "$active" == "true" ]] && active="*" || active=" "
-      version=`echo $installed_version | cut -d'|' -f2`
-      printf "$format_string" "$active" "$version"
+      record_active=$(_svm_parse_active_from_installedversions_record "$installed_version")
+      [[ "$record_active" == "true" ]] && active="*" || active=" "
+      record_version=$(_svm_parse_version_from_installedversions_record "$installed_version")
+      printf "$format_string" "$active" "$record_version"
     done
   else
     _svm_info_message "No scriptcs versions found."
@@ -164,24 +375,29 @@ _svm_list() {
 
 _svm_list_active() {
   local installed_versions=()
-  local active_version=""
+  local record_active=""
+  local record_version=""
 
   installed_versions=($(_svm_get_installed_versions))
   for installed_version in "${installed_versions[@]}"; do
-    if [ `echo $installed_version | cut -d'|' -f1` == "true" ]; then
-      active_version=`echo $installed_version | cut -d'|' -f2`
+    record_active=$(_svm_parse_active_from_installedversions_record "$installed_version")
+    if [ "$record_active" == "true" ]; then
+      record_version=$(_svm_parse_version_from_installedversions_record "$installed_version")
     fi
   done
 
-  if [[ $active_version == "" && ${#installed_versions[@]} -gt 1 ]]; then
+  if [[ $record_version == "" && ${#installed_versions[@]} -gt 1 ]]; then
     _svm_info_message "No active scriptcs version found."
     _svm_info_message "\n Consider using svm use <version> to set the active scriptcs version."
-  elif [[ $active_version == "" && ${#installed_versions[@]} -eq 0 ]]; then
+
+  elif [[ $record_version == "" && ${#installed_versions[@]} -eq 0 ]]; then
     _svm_info_message "No scriptcs versions found."
     _svm_info_message "\n Consider using svm install <version> to install a scriptcs version."
+
   else
     _svm_info_message "The following is the active scriptcs version:\n"
-    _svm_info_message "  $active_version"
+    _svm_info_message "  $record_version"
+
   fi
 }
 
@@ -192,18 +408,22 @@ _svm_use_version() {
   version=$(_svm_trim_string "$version")
   local installed_versions=($(_svm_get_installed_versions))
   for installed_version in "${installed_versions[@]}"; do
-    if [ `echo $installed_version | cut -d'|' -f2` == "$version" ]; then
+
+    local record_version=$(_svm_parse_version_from_installedversions_record "$installed_version")
+    if [ $record_version == "$version" ]; then
       is_version_installed=1
+      break
     fi
   done
 
-  if [ $is_version_installed -eq "1" ]
-  then
+  if [ $is_version_installed -eq "1" ]; then
     echo "$version" > $VERSION_FILE_PATH
     _svm_info_message "Active scriptcs version set to '$version'."
+
   else
     _svm_error_message "Version '$version' cannot be found in versions folder '$VERSIONS_PATH'."
     _svm_error_message "Consider using svm install <version> to install the scriptcs version."
+
   fi
 }
 
@@ -227,31 +447,69 @@ else
       _svm_help
     ;;
 
+    "install" )
+
+      # svm install <-l|-list>
+      if [[ $# -eq 2 && ( $2 == "-l" || $2 == "-list" ) ]]; then
+        _svm_install_list
+
+      # svm install <version>
+      elif [ $# -eq 2 ]; then
+        version="$2"
+        _svm_install_version "$version"
+
+      # svm install <version> -from <path>
+      elif [[ $# -eq 4 && $3 == "-from" ]]; then
+        version="$2"
+        path="$4"
+        _svm_install_version_from_path "$version" "$path"
+
+      # not valid option
+      else
+        _svm_help && echo "" && exit
+      fi
+    ;;
+
     "remove" )
+
       # svm remove <version>
-      [[ $# -ne 2 ]] && _svm_help && echo "" && exit
-      version="$2"
-      _svm_remove_version "$version"
+      if [ $# -eq 2 ]; then
+        version="$2"
+        _svm_remove_version "$version"
+
+      # not valid option
+      else
+        _svm_help && echo "" && exit
+      fi
     ;;
 
     "list" )
+
       # svm list
-      # svm list [-a|-active 
       if [ $# -eq 1 ]; then
         _svm_list
+
+      # svm list [-a|-active
       elif [[ $# -eq 2 && ( $2 == "-a" || $2 == "-active" ) ]]; then
         _svm_list_active
+
+      # not valid option
       else
         _svm_help && echo "" && exit
       fi
     ;;
 
     "use" )
-      # svm use <version>
-      [[ $# -ne 2 ]] && _svm_help && echo "" && exit
 
-      version="$2"
-      _svm_use_version "$version"
+      # svm use <version>
+      if [ $# -eq 2 ]; then
+        version="$2"
+        _svm_use_version "$version"
+
+      # not valid option
+      else
+        _svm_help && echo "" && exit
+      fi
     ;;
 
     *)

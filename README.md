@@ -4,7 +4,7 @@ svm (scriptcs version manager)
 ** *This is a work in progress* **
 
 
-     scriptcs version manager - 0.1.0
+     scriptcs version manager - 0.2.0
 
       USAGE: svm <command> [options]
 
@@ -61,7 +61,7 @@ Start a new command prompt after installing and type the following to get starte
 
 ## *nix ##
 
-This should work on OS X and Linux. I have tested on Ubuntu so far. You will need mono installed.
+This should work on OS X and Linux. This has been tested on Ubuntu 14.04 so far.
 
 ### Prerequisites ###
 
@@ -94,18 +94,22 @@ Building mono 3.4.0 from a tarball on Ubuntu 14.04
 **unzip**
 
 	sudo apt-get -y install unzip
+
+**curl**
+
+	sudo apt-get -y install curl
  
 ### Install and configure svm ###
 
-This is manual for now ...
+This is manual for now ... an installer is in the works.
 
 Create the following folder:
 
 `mkdir ~\.svm`
 
-Copy the `src` folder of the git repo to the `.svm` folder.
+Copy the shell scripts and folder structure from the `src` folder of the git repo to the `.svm` folder.
 
-You should have something like the following folder structure:
+You should have something like the following structure:
 
 
     bin\
@@ -122,36 +126,21 @@ Set the PATH as follows:
 
 	export PATH="$HOME/.svm/bin:$HOME/.svm/shims/:$PATH"
 
-You could instead add the following to your `.bashrc`:
+You could also append the following to your `.bashrc`:
 
 	# scriptcs version manager
 	export PATH="$HOME/.svm/bin:$HOME/.svm/shims/:$PATH"
 
-Set correct file attributes as follows:
+Set the correct file attributes as follows:
 
 	chmod 755 ~/.svm/bin/svm
 	chmod 755 ~/.svm/shims/scriptcs
 
 
-### Install scriptcs versions manually for now. ###
-
-Download `0.10.2` version of nupkg:
-
-	curl http://chocolatey.org/api/v2/package/ScriptCs/0.10.2 -L -o ScriptCs.0.10.2.nupkg
-
-Change `.nupkg` extensions to`.zip`, unzip files and place contents of `tools\scriptcs` folder into the `.svm\versions\` folder. It should look something like the following now:
-
-	versions\
-		0.10.2
-
 ### Start using ###
 
-Type the following in a terminal:
+Type the following in a terminal to get started:
 
 	svm help
 
-The *nix version currently implements the following commands:
 
-	svm use <version>
-	svm list [-a|-active]
-	svm remove <version>
