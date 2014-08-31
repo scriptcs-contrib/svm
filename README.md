@@ -99,43 +99,11 @@ Building mono 3.4.0 from a tarball on Ubuntu 14.04
 
 	sudo apt-get -y install curl
  
-### Install and configure svm ###
+### Install ###
 
-This is manual for now ... an installer is in the works.
+The easiest way to obtain `svm` is to run the following command in a terminal:
 
-Create the following folder:
-
-`mkdir ~\.svm`
-
-Copy the shell scripts and folder structure from the `src` folder of the git repo to the `.svm` folder.
-
-You should have something like the following structure:
-
-
-    bin\
-      svm
-
-    shims\
-      scriptcs
-
-    versions\
-
-    version
-
-Set the PATH as follows:
-
-	export PATH="$HOME/.svm/bin:$HOME/.svm/shims/:$PATH"
-
-You could also append the following to your `.bashrc`:
-
-	# scriptcs version manager
-	export PATH="$HOME/.svm/bin:$HOME/.svm/shims/:$PATH"
-
-Set the correct file attributes as follows:
-
-	chmod 755 ~/.svm/bin/svm
-	chmod 755 ~/.svm/shims/scriptcs
-
+	 bash <(curl -s https://raw.githubusercontent.com/paulbouwer/svm/master/install/installer.sh) && export PATH="$HOME/.svm/bin:$HOME/.svm/shims/:$PATH"
 
 ### Start using ###
 
