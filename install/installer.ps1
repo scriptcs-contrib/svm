@@ -1,5 +1,4 @@
 $userSvmPath = $env:USERPROFILE + "\.svm"
-$scriptPath = $myInvocation.MyCommand.Definition
 
 #
 # helper functions
@@ -76,12 +75,14 @@ function Install-SvmPackage
   $destination.CopyHere($zipFile.items(), 0x14) #0x4 = don't show UI, 0x10 = overwrite files
 
   # Only copy Windows specific contents into the install folder
-  $zipFolderToExtract = [System.IO.Path]::Combine($unzipFolder, 'svm-master', 'src', 'bin')
+  $zipFolderToExtract = [System.IO.Path]::Combine($unzipFolder, 'scriptcs-svm-0.2.0', 'src', 'bin')
   Remove-Item -Path $([System.IO.Path]::Combine($zipFolderToExtract, 'svm'))
   Copy-Item -Path $zipFolderToExtract -Recurse -Destination $installPath
-  $zipFolderToExtract = [System.IO.Path]::Combine($unzipFolder, 'svm-master', 'src', 'shims')
+  $zipFolderToExtract = [System.IO.Path]::Combine($unzipFolder, 'scriptcs-svm-0.2.0', 'src', 'shims')
   Remove-Item -Path $([System.IO.Path]::Combine($zipFolderToExtract, 'scriptcs'))
   Copy-Item -Path $zipFolderToExtract -Recurse -Destination $installPath
+
+  # TODO - remove temp download folder
 }
 
 function Configure-Environment
@@ -90,13 +91,13 @@ function Configure-Environment
     [string] $installPath
   )
 
-  Write-InfoMessage "Configuring path environment variable for svm."
+  Write-InfoMessage "Configuring path environment variables for svm."
 
   $envPath = [Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::User)
 
   $foldersToPrependToPath = @()
-  $foldersToPrependToPath += [System.IO.Path]::Combine($userSvmPath, 'bin')
-  $foldersToPrependToPath += [System.IO.Path]::Combine($userSvmPath, 'shims')
+  $foldersToPrependToPath += [System.IO.Path]::Combine($installPath, 'bin')
+  $foldersToPrependToPath += [System.IO.Path]::Combine($installPath, 'shims')
 
   $newPath = ($foldersToPrependToPath)
   foreach($path in $envPath.Split(';'))
@@ -118,7 +119,7 @@ function Configure-Environment
 Write-TitleMessage "scriptcs version manager - installer"
 
 $installPath  = $userSvmPath
-$url          = "https://github.com/paulbouwer/svm/archive/master.zip"
+$url          = "https://github.com/paulbouwer/scriptcs-svm/archive/v0.2.0.zip"
 $downloadPath = [System.IO.Path]::Combine($env:TEMP, [Guid]::NewGuid(), 'svm-install.zip')
 
 New-SvmInstallLocation $installPath
