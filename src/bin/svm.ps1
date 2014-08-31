@@ -54,7 +54,7 @@ function String-IsEmptyOrWhitespace
 function Get-VersionsAvailableToInstall
 {
   # TODO replace with call to svm web api (include release and nightly versions) ...
-  # currently hard coded list
+
   $versions = @();
 
   $version = New-Object PSObject -Property @{
@@ -126,7 +126,8 @@ function Get-VersionsAvailableToInstall
   return $versions
 }
 
-function Get-VersionToInstall
+
+function Get-InstallVersionInfo
 {
   param(
     [string] $version
@@ -315,6 +316,7 @@ function Svm-InstallVersionFromPath
 
   if (Test-Path -Path $path -PathType container)
   {
+    Write-InfoMessage "Obtaining version '$version' from '$path'."
     Write-InfoMessage "Installing version '$version'."
     Install-ScriptCsFromFolder -sourcePath $path -installPath $installPath
   }
@@ -324,6 +326,7 @@ function Svm-InstallVersionFromPath
     $workingPath = [System.IO.Path]::Combine($tempPath, [Guid]::NewGuid())
     $nuGetPackagePath = [System.IO.Path]::Combine($workingPath, $nugetPackage)
 
+    Write-InfoMessage "Obtaining version '$version' from '$path'."
     New-Item $workingPath -type Directory | Out-Null
     Copy-Item -Path $path -Destination $nuGetPackagePath
 
@@ -355,7 +358,7 @@ function Svm-InstallVersion
     return
   }
 
-  $installVersion = Get-VersionToInstall -version $version
+  $installVersion = Get-InstallVersionInfo -version $version
 
   Write-InfoMessage "Downloading version '$version' from '$($installVersion.URL)'."
   $nugetPackage = 'ScriptCs.{0}.nupkg' -f $version
