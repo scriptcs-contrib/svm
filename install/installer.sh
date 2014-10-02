@@ -83,11 +83,11 @@ _svminstaller_configure_environment() {
 	path=${path#:}
 
 	# write to .bashrc if it exists
-	if [ -f "$HOME/.bashrc" ]; then
-		_svm_info_message "Writing entry into .bashrc file found at '$HOME/.bashrc'."
-		echo '' >> "$HOME/.bashrc"
-		echo '# scriptcs version manager' >> "$HOME/.bashrc"
-		echo 'export PATH="$HOME/.svm/bin:$HOME/.svm/shims:$PATH"' >> "$HOME/.bashrc"
+	if [ -f "$HOME/.bash_profile" ]; then
+		_svm_info_message "Writing entry into .bash_profile file found at '$HOME/.bash_profile'."
+		echo '' >> "$HOME/.bash_profile"
+		echo '# scriptcs version manager' >> "$HOME/.bash_profile"
+		echo 'export PATH="$HOME/.svm/bin:$HOME/.svm/shims:$PATH"' >> "$HOME/.bash_profile"
 	fi
 
 	# set execute file attribute on shell scripts
