@@ -4,12 +4,13 @@ param (
   [alias("a")][switch] $active = $false,
   [alias("l")][switch] $list = $false,
   [alias("f")][string] $from = "",
+  [alias("s")][switch] $snapshot = $false,
   [parameter(Position=1, ValueFromRemainingArguments=$true)]
   [string[]]$scriptArgs=@()
 )
 
 #$svmVersion = "{{VERSION}}"
-$svmVersion = "0.2.0"
+$svmVersion = "0.3.0"
 
 $scriptPath       = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition)  # \.svm\bin
 $svmPath          = [System.IO.Directory]::GetParent($scriptPath).FullName                  # \.svm\
@@ -178,12 +179,21 @@ function Install-ScriptCsFromFolder
 {
   param(
     [string] $sourcePath,
-    [string] $installPath
+    [string] $installPath,
+    [string] $mode
   )
 
-  New-Item $installPath -type Directory | Out-Null
-  $sourceFiles = [System.IO.Path]::Combine($sourcePath, '*')
-  Copy-Item -Path $sourceFiles -Recurse -Destination $installPath
+  if ($mode -eq "snapshot")
+  {
+    New-Item $installPath -type Directory | Out-Null
+    $sourceFiles = [System.IO.Path]::Combine($sourcePath, '*')
+    Copy-Item -Path $sourceFiles -Recurse -Destination $installPath
+  }
+  else
+  {
+    $command = "cmd /c mklink /J"
+    invoke-expression "$command $installPath $sourcePath" | Out-Null
+  }
 }
 
 function Get-ActiveVersion
@@ -250,11 +260,14 @@ $helpMessage = @"
     > svm install 0.10.0
     > svm install 0.10.1
 
-  svm install <version> -from <path>
-    Install scriptcs version from path <path> as version <version>. Path may be a local folder or a local NuGet package.
-    examples:
-    > svm install mybuild-0.10.1 -from 'C:\scriptcs\bin\Debug'
-    > svm install 0.10.1 -from 'C:\Downloads\ScriptCs.0.10.1.nupkg'
+  svm install <version> <-f|-from> <path> [-s|-snapshot]
+    Install scriptcs version from path <path> as version <version>. Path may be a local folder or a local NuGet
+    package. If Path is a local folder, then a soft link to the local folder is created. Use the -snapshot option
+    to create a snapshot of the local folder instead of a soft link.
+      examples:
+      > svm install mybuild-0.10.1 -f 'C:\scriptcs\artifacts\Release\bin'
+      > svm install mybuild-0.10.1 -from 'C:\scriptcs\artifacts\Release\bin' -snapshot
+      > svm install 0.10.1 -from 'C:\Downloads\ScriptCs.0.10.1.nupkg'
 
   svm install <-l|-list>
     List the scriptcs versions avaiable to install.
@@ -303,7 +316,8 @@ function Svm-InstallVersionFromPath
 {
   param(
     [string] $version,
-    [string] $path
+    [string] $path,
+    [string] $mode
   )
 
   $version = $version.Trim()
@@ -318,10 +332,16 @@ function Svm-InstallVersionFromPath
   {
     Write-InfoMessage "Obtaining version '$version' from '$path'."
     Write-InfoMessage "Installing version '$version'."
-    Install-ScriptCsFromFolder -sourcePath $path -installPath $installPath
+    Install-ScriptCsFromFolder -sourcePath $path -installPath $installPath -mode $mode
   }
   elseif ([System.IO.Path]::GetExtension($path) -eq ".nupkg")
   {
+    if ($mode -ne '')
+    {
+      Write-ErrorMessage "The -snapshot option cannot be used when the path specifies a NuGet package."
+      return
+    }
+
     $nugetPackage = [System.IO.Path]::GetFileName($path)
     $workingPath = [System.IO.Path]::Combine($tempPath, [Guid]::NewGuid())
     $nuGetPackagePath = [System.IO.Path]::Combine($workingPath, $nugetPackage)
@@ -386,7 +406,7 @@ function Svm-RemoveVersion
 
   if ($versionToRemove)
   {
-    Remove-Item $versionToRemove.Location -Recurse -ErrorAction SilentlyContinue
+    Remove-Item $versionToRemove.Location -Force -Recurse -ErrorAction SilentlyContinue
     Write-InfoMessage "The scriptcs version '$($version)' has been removed from versions folder '$($versionsPath)'."
 
     $newActiveVersion = $versions |? { $_.Version -ne $version } | select -First 1
@@ -478,6 +498,8 @@ function Parse-CommandParameters
     {
       if (-not $active -and -not $list -and $(String-IsEmptyOrWhitespace($from)) -and $scriptArgs.Count -eq 1)
       { $parsedCommand = "install <version>" }
+      elseif (-not $active -and -not $list -and !$(String-IsEmptyOrWhitespace($from)) -and $snapshot -and $scriptArgs.Count -eq 1)
+      { $parsedCommand = "install <version> -from <path> -snapshot" }
       elseif (-not $active -and -not $list -and !$(String-IsEmptyOrWhitespace($from)) -and $scriptArgs.Count -eq 1)
       { $parsedCommand = "install <version> -from <path>" }
       elseif (-not $active -and $list -and $(String-IsEmptyOrWhitespace($from)) -and $scriptArgs.Count -eq 0)
@@ -520,15 +542,16 @@ try
   $parsedCommand = Parse-CommandParameters
   switch ($parsedCommand)
   {
-    "install <version>"               { Svm-InstallVersion -version $scriptArgs[0] }
-    "install <version> -from <path>"  { Svm-InstallVersionFromPath -version $scriptArgs[0] -path $from }
-    "install -list"                   { Svm-InstallList }
-    "remove <version>"                { Svm-RemoveVersion -version $scriptArgs[0] }
-    "list"                            { Svm-List }
-    "list -active"                    { Svm-ListActive }
-    "use <version>"                   { Svm-UseVersion -version $scriptArgs[0] }
-    "help"                            { Svm-Help }
-    default                           { Svm-Help }
+    "install <version>"                         { Svm-InstallVersion -version $scriptArgs[0] }
+    "install <version> -from <path>"            { Svm-InstallVersionFromPath -version $scriptArgs[0] -path $from }
+    "install <version> -from <path> -snapshot"  { Svm-InstallVersionFromPath -version $scriptArgs[0] -path $from -mode "snapshot" }
+    "install -list"                             { Svm-InstallList }
+    "remove <version>"                          { Svm-RemoveVersion -version $scriptArgs[0] }
+    "list"                                      { Svm-List }
+    "list -active"                              { Svm-ListActive }
+    "use <version>"                             { Svm-UseVersion -version $scriptArgs[0] }
+    "help"                                      { Svm-Help }
+    default                                     { Svm-Help }
   }
 }
 catch

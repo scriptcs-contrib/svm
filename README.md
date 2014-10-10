@@ -1,10 +1,8 @@
 svm (scriptcs version manager)
 ===
 
-** *This is a work in progress* **
 
-
-     scriptcs version manager - 0.2.0
+     scriptcs version manager - 0.3.0
 
       USAGE: svm <command> [options]
 
@@ -14,10 +12,13 @@ svm (scriptcs version manager)
 	    > svm install 0.10.0
 	    > svm install 0.10.1
 	
-	  svm install <version> -from <path>
-	    Install scriptcs version from path <path> as version <version>. Path may be a local folder or a local NuGet package.
+	  svm install <version> <-f|-from> <path> [-s|-snapshot]
+	    Install scriptcs version from path <path> as version <version>. Path may be a local folder or a local NuGet 
+		package. If Path is a local folder, then a soft link to the local folder is created. Use the -snapshot option
+		to create a snapshot of the local folder instead of a soft link. 
 	    examples:
-	    > svm install mybuild-0.10.1 -from 'C:\scriptcs\bin\Debug'
+	    > svm install mybuild-0.10.1 -f 'C:\scriptcs\artifacts\Release\bin'
+	    > svm install mybuild-0.10.1 -from '/tmp/scriptcs/artifacts/Release/bin' -snapshot
     	> svm install 0.10.1 -from 'C:\Downloads\ScriptCs.0.10.1.nupkg'
 	
 	  svm install <-l|-list>
@@ -67,38 +68,25 @@ This should work on OS X and Linux. This has been tested on Ubuntu 14.04 so far.
 
 #### mono ####
 
-Building mono 3.4.0 from a tarball on Ubuntu 14.04
+Building mono 3.10.0 from a tarball on Ubuntu 14.04
 
 	$ mkdir /tmp/scriptcs
 	$ cd /tmp/scriptcs
-	$ wget http://download.mono-project.com/sources/mono/mono-3.4.0.tar.bz2
-	$ tar -xjvf mono-3.4.0.tar.bz2
-	$ cd mono-3.4.0
-
-	$ cat > mcs/tools/xbuild/targets/Microsoft.Portable.Common.targets
-
-	-- PASTE --
-	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	  <Import Project=".\Microsoft.Portable.Core.props" />
-	  <Import Project=".\Microsoft.Portable.Core.targets" />
-	</Project>
-	-- CTRL + D --
-
-	$ sudo apt-get -y install autoconf make gcc g++ gettext
+	$ wget http://origin-download.mono-project.com/sources/mono/mono-3.10.0.tar.bz2 
+	$ tar -xjvf mono-3.10.0.tar.bz2
+	$ cd mono-3.10.0
+	$ sudo apt-get -y install git autoconf libtool automake build-essential mono-devel gettext
 	$ ./configure --prefix=/usr/local
 	$ make
 	$ sudo make install
 
+
 #### packages ####
 
-**unzip**
+The following packages are required: unzip, curl
 
-	sudo apt-get -y install unzip
+	sudo apt-get -y install unzip curl
 
-**curl**
-
-	sudo apt-get -y install curl
- 
 ### Install ###
 
 The easiest way to obtain `svm` is to run the following command in a terminal:
