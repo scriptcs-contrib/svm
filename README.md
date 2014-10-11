@@ -52,11 +52,11 @@ This work and implementation was inspired by [rbenv](https://github.com/sstephen
 
 The easiest way to obtain `svm` is to run the following command in a command prompt:
 
-	@powershell -NoProfile -ExecutionPolicy unrestricted -Command "iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/paulbouwer/svm/master/install/installer.ps1'))"
+	@powershell -NoProfile -ExecutionPolicy unrestricted -Command "iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/paulbouwer/svm/master/install/installer.ps1'))" && SET PATH=%HOME%\.svm\bin\;%HOME%\.svm\shims\;%PATH%
 
 ### Start using ###
 
-Start a new command prompt after installing and type the following to get started:
+Type the following in the command prompt to get started:
 
 	svm help
 
