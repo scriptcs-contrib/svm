@@ -9,7 +9,7 @@ TEMP_PATH="/tmp"
 
 _svm_title_message() {
   local message="$1"
-  echo -e "\n\e[1;4m $message \e[0m\n"
+  echo -e "\n\033[1;4m $message \033[0m\n"
 }
 _svm_info_message() {
   local message="$1"
@@ -17,7 +17,7 @@ _svm_info_message() {
 }
 _svm_error_message() {
   local message="$1"
-  echo -e "\e[41m $message \e[0m"
+  echo -e "\033[41m $message \033[0m"
 }
 
 _svminstaller_create_install_location() {
