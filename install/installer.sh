@@ -20,6 +20,11 @@ _svm_error_message() {
   echo -e "\033[41m $message \033[0m"
 }
 
+_svm_isinstalled() {
+  type "$1" > /dev/null 2>&1
+  return $?
+}
+
 _svminstaller_create_install_location() {
 	local install_path="$1"
 
@@ -82,15 +87,44 @@ _svminstaller_configure_environment() {
 	path=${path%:}
 	path=${path#:}
 
-	# write to .bashrc if it exists
-	if [ -f "$HOME/.bash_profile" ]; then
-		_svm_info_message "Writing entry into .bash_profile file found at '$HOME/.bash_profile'."
-		echo '' >> "$HOME/.bash_profile"
-		echo '# scriptcs version manager' >> "$HOME/.bash_profile"
-		echo 'export PATH="$HOME/.svm/bin:$HOME/.svm/shims:$PATH"' >> "$HOME/.bash_profile"
+	local startup_file=""
+
+	# write to .bash_profile if bash is installed
+	startup_file="$HOME/.bash_profile"
+	if _svm_isinstalled "bash"; then
+		if [[ $(grep '# scriptcs version manager' "$startup_file" -s) ]]; then
+			_svm_info_message "Existing entry in .bash_profile file found at '$startup_file'. File will not be modified."
+		else
+			_svm_info_message "Writing entry into .bash_profile file found at '$startup_file'."
+			echo '' >> "$startup_file"
+			echo '# scriptcs version manager' >> "$startup_file"
+			echo '. $HOME/.svm_profile' >> "$startup_file"
+		fi
 	fi
+	# write to .zshrc if zsh is installed
+	startup_file="$HOME/.zshrc"
+	if _svm_isinstalled "zsh"; then
+		if [[ $(grep '# scriptcs version manager' "$startup_file" -s) ]]; then
+			_svm_info_message "Existing entry in .zshrc file found at '$startup_file'. File will not be modified."
+		else
+			_svm_info_message "Writing entry into .zshrc file found at '$startup_file'."
+			echo '' >> "$startup_file"
+			echo '# scriptcs version manager' >> "$startup_file"
+			echo '. $HOME/.svm_profile' >> "$startup_file"
+		fi
+	fi
+	# write to .svm_profile
+	startup_file="$HOME/.svm_profile"
+	if [ -f "$startup_file" ]; then
+		_svm_info_message "Overwriting .svm_profile file at '$startup_file'."
+	else
+		_svm_info_message "Creating .svm_profile file at '$startup_file'."
+	fi
+	echo '# scriptcs version manager' > "$startup_file"
+	echo 'export PATH="$HOME/.svm/bin:$HOME/.svm/shims:$PATH"' >> "$startup_file"
 
 	# set execute file attribute on shell scripts
+	chmod 644 "$HOME/.svm_profile"
 	chmod 755 "$USER_SVM_PATH/bin/svm"
 	chmod 755 "$USER_SVM_PATH/shims/scriptcs"
 }
