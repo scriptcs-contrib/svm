@@ -1,6 +1,7 @@
 svm (scriptcs version manager)
 ===
 
+svm is a cross platform version manager for [scriptcs](http://scriptcs.net/ "scriptcs makes it easy to write and execute C# with a simple text editor."). It is available on Windows, Mac OS X and Linux.
 
      scriptcs version manager - 0.3.0
 
@@ -60,9 +61,32 @@ Start a new command prompt after installing and type the following to get starte
 	svm help
 
 
-## *nix ##
+## Mac OS X ##
 
-This should work on OS X and Linux. This has been tested on Ubuntu 14.04 so far.
+### Prerequisites ###
+
+#### mono ####
+
+Mono 3.10.0 for Mac OS X is available as a Mac Package (.pkg)
+
+	http://www.mono-project.com/download/#download-mac
+
+### Install ###
+
+The easiest way to obtain `svm` is to run the following command in a terminal:
+
+	 bash <(curl -s https://raw.githubusercontent.com/paulbouwer/svm/master/install/installer.sh) && export PATH="$HOME/.svm/bin:$HOME/.svm/shims/:$PATH"
+
+### Start using ###
+
+Type the following in a terminal to get started:
+
+	svm help
+
+
+## Linux ##
+
+This has been tested on Ubuntu 14.04 so far.
 
 ### Prerequisites ###
 
@@ -98,5 +122,3 @@ The easiest way to obtain `svm` is to run the following command in a terminal:
 Type the following in a terminal to get started:
 
 	svm help
-
-
