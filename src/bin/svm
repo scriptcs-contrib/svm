@@ -115,7 +115,7 @@ _svm_install_scriptcs_from_folder() {
   local install_path="$2"
   local mode="$3"
 
-  if [ $mode == "snapshot" ]; then
+  if [[ $mode == "snapshot" ]]; then
     mkdir "$install_path"
     cp -fR "$source_path/." "$install_path"
   else
