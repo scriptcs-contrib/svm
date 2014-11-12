@@ -3,10 +3,6 @@ svm (scriptcs version manager)
 
 svm is a cross platform version manager for [scriptcs](http://scriptcs.net/ "scriptcs makes it easy to write and execute C# with a simple text editor."). It is available on Windows, Mac OS X and Linux.
 
-     scriptcs version manager - 0.3.0
-
-      USAGE: svm <command> [options]
-
 	  svm install <version>
 	    Install scriptcs version indicated by <version>.
 	    examples:
