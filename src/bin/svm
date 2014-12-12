@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SVM_VERSION="{{VERSION}}"
-SVM_VERSION="0.3.0"
+SVM_VERSION="0.3.2"
 
 SCRIPT_PATH="${BASH_SOURCE[0]%/*}"                                  # /.svm/bin
 SVM_PATH=${SCRIPT_PATH%/bin}                                        # /.svm/
@@ -40,8 +40,9 @@ _svm_get_versions_available_to_install() {
 
   # Format: Version|PublishedDate|URL
   versions+=("0.10.0|2014-07-30T02:22:35.907|http://chocolatey.org/api/v2/package/ScriptCs/0.10.0")
-  versions+=("0.10.1|2014-07-30T22:24:13.01|http://chocolatey.org/api/v2/package/ScriptCs/0.10.1")
+  versions+=("0.10.1|2014-07-30T22:24:13.010|http://chocolatey.org/api/v2/package/ScriptCs/0.10.1")
   versions+=("0.10.2|2014-08-01T02:41:53.897|http://chocolatey.org/api/v2/package/ScriptCs/0.10.2")
+  versions+=("0.11.0|2014-12-11T00:00:00.000|http://chocolatey.org/api/v2/package/ScriptCs/0.11.0")
 
   echo ${versions[@]}
 }
@@ -177,17 +178,17 @@ _svm_help() {
   echo "  svm install <version>"
   echo "    Install scriptcs version indicated by <version>."
   echo "    examples:"
-  echo "    > svm install 0.10.0"
-  echo "    > svm install 0.10.1"
+  echo "    > svm install 0.11.0"
+  echo "    > svm install 0.10.2"
   echo ""
   echo "  svm install <version> <-f|-from> <path> [-s|-snapshot]"
   echo "    Install scriptcs version from path <path> as version <version>. Path may be a local folder or a local NuGet"
   echo "    package. If Path is a local folder, then a soft link to the local folder is created. Use the -snapshot option"
   echo "    to create a snapshot of the local folder instead of a soft link."
   echo "    examples:"
-  echo "    > svm install mybuild-0.10.2 -f '/tmp/scriptcs/artifacts/Release/bin'"
-  echo "    > svm install mybuild-0.10.2 -from '/tmp/scriptcs/artifacts/Release/bin' -snapshot"
-  echo "    > svm install 0.10.2 -from '/tmp/downloads/ScriptCs.0.10.2.nupkg'"
+  echo "    > svm install mybuild-0.11.0 -f '/tmp/scriptcs/artifacts/Release/bin'"
+  echo "    > svm install mybuild-0.11.0 -from '/tmp/scriptcs/artifacts/Release/bin' -snapshot"
+  echo "    > svm install 0.11.0 -from '/tmp/downloads/ScriptCs.0.10.2.nupkg'"
   echo ""
   echo "  svm install <-l|-list>"
   echo "    List the scriptcs versions avaiable to install."
@@ -209,7 +210,7 @@ _svm_help() {
   echo "  svm use <version>"
   echo "    Use the installed scriptcs version indicated by <version>."
   echo "    examples:"
-  echo "    > svm use 0.10.2"
+  echo "    > svm use 0.11.0"
 }
 
 _svm_install_list() {

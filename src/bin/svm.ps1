@@ -10,7 +10,7 @@ param (
 )
 
 #$svmVersion = "{{VERSION}}"
-$svmVersion = "0.3.0"
+$svmVersion = "0.3.2"
 
 $scriptPath       = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition)  # \.svm\bin
 $svmPath          = [System.IO.Directory]::GetParent($scriptPath).FullName                  # \.svm\
@@ -59,68 +59,30 @@ function Get-VersionsAvailableToInstall
   $versions = @();
 
   $version = New-Object PSObject -Property @{
-    Version               = "0.8.0"
-    IsLatestVersion       = $false
-    PublishedDate         = "2013-09-18T22:22:13.293"
-    Platform              = @("Windows")
-    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.8.0"
-    PackageHashAlgorithm  = "SHA512"
-    PackageHash           = "zxoQn+XY2MqRZlSiupdT7b6h+Xn04k1/AdS1dswJ2FJGTHUc2a0jgeMBltYFOjOWwaZdeNleDTQdFPbW01wqzw=="
-  }
-  $versions += $version
-
-  $version = New-Object PSObject -Property @{
-    Version               = "0.8.1"
-    IsLatestVersion       = $false
-    PublishedDate         = "2013-10-12T12:20:10.957"
-    Platform              = @("Windows")
-    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.8.1"
-    PackageHashAlgorithm  = "SHA512"
-    PackageHash           = "Btz11BN+i6+54I3r8/itfM49QZzjGVM3z7g8Fd6qHPRulKgv7WKdpNUDHrqnOxMo+h19rIyyDVX4ImgLny+AKg=="
-  }
-  $versions += $version
-
-  $version = New-Object PSObject -Property @{
-    Version               = "0.9.0"
-    IsLatestVersion       = $false
-    PublishedDate         = "2014-02-07T00:43:58.223"
-    Platform              = @("Windows")
-    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.9.0"
-    PackageHashAlgorithm  = "SHA512"
-    PackageHash           = "gtlte9gS+1WT3jjkAgUxuAF9SqrhVfYfqtKaQo3Sga/Q8JbpCPo1zHmN/694JApyg02Wn+PLMXYIHhwxxG3xsw=="
-  }
-  $versions += $version
-
-  $version = New-Object PSObject -Property @{
     Version               = "0.10.0"
-    IsLatestVersion       = $false
     PublishedDate         = "2014-07-30T02:22:35.907"
-    Platform              = @("Linux", "Mac", "Windows")
     URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.10.0"
-    PackageHashAlgorithm  = "SHA512"
-    PackageHash           = "ovPmZUIjpXgTcmR+xgVEEJ5O+Lynh50F5RMNHo0WZk4r0Jr9DakU6syhEbEluOQVLZ1em+8UFeOzaLzb0DjMlw=="
   }
   $versions += $version
 
   $version = New-Object PSObject -Property @{
     Version               = "0.10.1"
-    IsLatestVersion       = $false
-    PublishedDate         = "2014-07-30T22:24:13.01"
-    Platform              = @("Linux", "Mac", "Windows")
+    PublishedDate         = "2014-07-30T22:24:13.010"
     URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.10.1"
-    PackageHashAlgorithm  = "SHA512"
-    PackageHash           = "sn3QtQaBrMZtOKjT2R5SvgEu0RqqFCdG6y2KZ2TSQfxsyk82GbzYgqQMJ4OrsfpmqOlMVHJSArGeZFDOVXAXbQ=="
   }
   $versions += $version
 
   $version = New-Object PSObject -Property @{
     Version               = "0.10.2"
-    IsLatestVersion       = $true
     PublishedDate         = "2014-08-01T02:41:53.897"
-    Platform              = @("Linux", "Mac", "Windows")
     URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.10.2"
-    PackageHashAlgorithm  = "SHA512"
-    PackageHash           = "kL//M9qdjSW2frQUD6t9YRfviLsqMt2GtDvvXcZVr8WzpgbPIKeHjgQTj7Wx1r9LfRed2XA2h1t1RTKcP22mbA=="
+  }
+  $versions += $version
+
+  $version = New-Object PSObject -Property @{
+    Version               = "0.11.0"
+    PublishedDate         = "2014-12-11T00:00:00.000"
+    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.11.0"
   }
   $versions += $version
 
@@ -257,17 +219,17 @@ $helpMessage = @"
   svm install <version>
     Install scriptcs version indicated by <version>.
     examples:
-    > svm install 0.10.0
-    > svm install 0.10.1
+    > svm install 0.11.0
+    > svm install 0.10.2
 
   svm install <version> <-f|-from> <path> [-s|-snapshot]
     Install scriptcs version from path <path> as version <version>. Path may be a local folder or a local NuGet
     package. If Path is a local folder, then a soft link to the local folder is created. Use the -snapshot option
     to create a snapshot of the local folder instead of a soft link.
       examples:
-      > svm install mybuild-0.10.1 -f 'C:\scriptcs\artifacts\Release\bin'
-      > svm install mybuild-0.10.1 -from 'C:\scriptcs\artifacts\Release\bin' -snapshot
-      > svm install 0.10.1 -from 'C:\Downloads\ScriptCs.0.10.1.nupkg'
+      > svm install mybuild-0.11.0 -f 'C:\scriptcs\artifacts\Release\bin'
+      > svm install mybuild-0.11.0 -from 'C:\scriptcs\artifacts\Release\bin' -snapshot
+      > svm install 0.11.0 -from 'C:\Downloads\ScriptCs.0.10.1.nupkg'
 
   svm install <-l|-list>
     List the scriptcs versions avaiable to install.
@@ -277,7 +239,7 @@ $helpMessage = @"
   svm remove <version>
     Remove installed scriptcs version indicated by <version>.
     examples:
-    > svm remove 0.9.0
+    > svm remove 0.10.0
 
   svm list [-a|-active]
     List the installed scriptcs versions.
@@ -289,7 +251,7 @@ $helpMessage = @"
   svm use <version>
     Use the installed scriptcs version indicated by <version>.
     examples:
-    > svm use 0.10.0
+    > svm use 0.11.0
 
 "@
   Write-InfoMessage $helpMessage

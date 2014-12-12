@@ -6,17 +6,17 @@ svm is a cross platform version manager for [scriptcs](http://scriptcs.net/ "scr
 	  svm install <version>
 	    Install scriptcs version indicated by <version>.
 	    examples:
-	    > svm install 0.10.0
-	    > svm install 0.10.1
+	    > svm install 0.11.0
+	    > svm install 0.10.2
 	
 	  svm install <version> <-f|-from> <path> [-s|-snapshot]
 	    Install scriptcs version from path <path> as version <version>. Path may be a local folder or a local NuGet 
 		package. If Path is a local folder, then a soft link to the local folder is created. Use the -snapshot option
 		to create a snapshot of the local folder instead of a soft link. 
 	    examples:
-	    > svm install mybuild-0.10.1 -f 'C:\scriptcs\artifacts\Release\bin'
-	    > svm install mybuild-0.10.1 -from '/tmp/scriptcs/artifacts/Release/bin' -snapshot
-    	> svm install 0.10.1 -from 'C:\Downloads\ScriptCs.0.10.1.nupkg'
+	    > svm install mybuild-0.11.0 -f 'C:\scriptcs\artifacts\Release\bin'
+	    > svm install mybuild-0.11.0 -from '/tmp/scriptcs/artifacts/Release/bin' -snapshot
+    	> svm install 0.11.0 -from 'C:\Downloads\ScriptCs.0.10.1.nupkg'
 	
 	  svm install <-l|-list>
 	    List the scriptcs versions avaiable to install.
@@ -26,7 +26,7 @@ svm is a cross platform version manager for [scriptcs](http://scriptcs.net/ "scr
 	  svm remove <version>
 	    Remove installed scriptcs version indicated by <version>.
 	    examples:
-	    > svm remove 0.9.0
+	    > svm remove 0.10.0
 	
 	  svm list [-a|-active]
 	    List the installed scriptcs versions.
@@ -38,7 +38,7 @@ svm is a cross platform version manager for [scriptcs](http://scriptcs.net/ "scr
 	  svm use <version>
 	    Use the installed scriptcs version indicated by <version>.
 	    examples:
-	    > svm use 0.10.0
+	    > svm use 0.11.0
 
 This work and implementation was inspired by [rbenv](https://github.com/sstephenson/rbenv), [rvm](https://github.com/wayneeseguin/rvm), [kvm](https://github.com/aspnet/KRuntime/tree/dev/setup) and [nvm](https://github.com/creationix/nvm).
 
