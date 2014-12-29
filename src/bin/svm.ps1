@@ -10,7 +10,7 @@ param (
 )
 
 #$svmVersion = "{{VERSION}}"
-$svmVersion = "0.3.2"
+$svmVersion = "0.3.3"
 
 $scriptPath       = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition)  # \.svm\bin
 $svmPath          = [System.IO.Directory]::GetParent($scriptPath).FullName                  # \.svm\
@@ -81,8 +81,15 @@ function Get-VersionsAvailableToInstall
 
   $version = New-Object PSObject -Property @{
     Version               = "0.11.0"
-    PublishedDate         = "2014-12-11T00:00:00.000"
+    PublishedDate         = "2014-12-11T01:36:47.487"
     URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.11.0"
+  }
+  $versions += $version
+
+  $version = New-Object PSObject -Property @{
+    Version               = "0.12.0"
+    PublishedDate         = "2014-12-24T19:47:22.007"
+    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.12.0"
   }
   $versions += $version
 

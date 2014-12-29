@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SVM_VERSION="{{VERSION}}"
-SVM_VERSION="0.3.2"
+SVM_VERSION="0.3.3"
 
 SCRIPT_PATH="${BASH_SOURCE[0]%/*}"                                  # /.svm/bin
 SVM_PATH=${SCRIPT_PATH%/bin}                                        # /.svm/
@@ -42,7 +42,8 @@ _svm_get_versions_available_to_install() {
   versions+=("0.10.0|2014-07-30T02:22:35.907|http://chocolatey.org/api/v2/package/ScriptCs/0.10.0")
   versions+=("0.10.1|2014-07-30T22:24:13.010|http://chocolatey.org/api/v2/package/ScriptCs/0.10.1")
   versions+=("0.10.2|2014-08-01T02:41:53.897|http://chocolatey.org/api/v2/package/ScriptCs/0.10.2")
-  versions+=("0.11.0|2014-12-11T00:00:00.000|http://chocolatey.org/api/v2/package/ScriptCs/0.11.0")
+  versions+=("0.11.0|2014-12-11T01:36:47.487|http://chocolatey.org/api/v2/package/ScriptCs/0.11.0")
+  versions+=("0.12.0|2014-12-24T19:47:22.007|http://chocolatey.org/api/v2/package/ScriptCs/0.12.0")
 
   echo ${versions[@]}
 }
