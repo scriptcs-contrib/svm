@@ -56,8 +56,8 @@ _svminstaller_install_package() {
 
 	_svm_info_message "Installing svm to '$install_path'."
 
-	unzip -j "$download_path" "scriptcs-svm-0.3.4/src/bin/*" -d "$install_path/bin" > /dev/null 2>&1
-	unzip -j "$download_path" "scriptcs-svm-0.3.4/src/shims/*" -d "$install_path/shims" > /dev/null 2>&1
+	unzip -j "$download_path" "svm-0.3.4/src/bin/*" -d "$install_path/bin" > /dev/null 2>&1
+	unzip -j "$download_path" "svm-0.3.4/src/shims/*" -d "$install_path/shims" > /dev/null 2>&1
 	mkdir "$install_path/versions"
 
 	# remove Windows specific resources from installed package

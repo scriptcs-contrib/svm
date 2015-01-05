@@ -1,4 +1,4 @@
-![svm](https://raw.githubusercontent.com/paulbouwer/scriptcs-svm/master/assets/logo.png)
+![svm](https://raw.githubusercontent.com/scriptcs-contrib/svm/master/assets/logo.png)
 
 scriptcs version manager
 

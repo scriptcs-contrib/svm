@@ -75,10 +75,10 @@ function Install-SvmPackage
   $destination.CopyHere($zipFile.items(), 0x14) #0x4 = don't show UI, 0x10 = overwrite files
 
   # Only copy Windows specific contents into the install folder
-  $zipFolderToExtract = [System.IO.Path]::Combine($unzipFolder, 'scriptcs-svm-0.3.4', 'src', 'bin')
+  $zipFolderToExtract = [System.IO.Path]::Combine($unzipFolder, 'svm-0.3.4', 'src', 'bin')
   Remove-Item -Path $([System.IO.Path]::Combine($zipFolderToExtract, 'svm'))
   Copy-Item -Path $zipFolderToExtract -Recurse -Destination $installPath
-  $zipFolderToExtract = [System.IO.Path]::Combine($unzipFolder, 'scriptcs-svm-0.3.4', 'src', 'shims')
+  $zipFolderToExtract = [System.IO.Path]::Combine($unzipFolder, 'svm-0.3.4', 'src', 'shims')
   Remove-Item -Path $([System.IO.Path]::Combine($zipFolderToExtract, 'scriptcs'))
   Copy-Item -Path $zipFolderToExtract -Recurse -Destination $installPath
 
