@@ -29,4 +29,4 @@ svm is a cross platform version manager for [scriptcs](http://scriptcs.net/ "scr
 
 ## Where can I get it ?
 
-Check out the options for [Installing svm](https://github.com/paulbouwer/scriptcs-svm/wiki/Installing-svm) on the [svm wiki](https://github.com/paulbouwer/scriptcs-svm/wiki).
+Check out the options for [Installing svm](https://github.com/scriptcs-contrib/svm/wiki/Installing-svm) on the [svm wiki](https://github.com/scriptcs-contrib/svm/wiki).
