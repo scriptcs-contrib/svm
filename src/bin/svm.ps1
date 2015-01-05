@@ -161,7 +161,7 @@ function Install-ScriptCsFromFolder
   else
   {
     $command = "cmd /c mklink /J"
-    invoke-expression "$command $installPath $sourcePath" | Out-Null
+    invoke-expression "$command '$installPath' '$sourcePath'" | Out-Null
   }
 }
 
