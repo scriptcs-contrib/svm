@@ -289,6 +289,7 @@ function Svm-InstallVersionFromPath
     [string] $mode
   )
 
+  New-Item -ItemType Directory -Force -Path $versionsPath | Out-Null
   $version = $version.Trim()
   $installPath = [System.IO.Path]::Combine($versionsPath, $version)
   if (Test-Path $installPath)
