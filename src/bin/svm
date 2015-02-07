@@ -44,6 +44,9 @@ _svm_get_versions_available_to_install() {
   versions+=("0.10.2|2014-08-01T02:41:53.897|http://chocolatey.org/api/v2/package/ScriptCs/0.10.2")
   versions+=("0.11.0|2014-12-11T01:36:47.487|http://chocolatey.org/api/v2/package/ScriptCs/0.11.0")
   versions+=("0.12.0|2014-12-24T19:47:22.007|http://chocolatey.org/api/v2/package/ScriptCs/0.12.0")
+  versions+=("0.13.0|2015-01-28T06:24:51.940|http://chocolatey.org/api/v2/package/ScriptCs/0.13.0")
+  versions+=("0.13.1|2015-02-05T13:05:59.493|http://chocolatey.org/api/v2/package/ScriptCs/0.13.1")
+  versions+=("0.13.2|2015-02-07T17:07:04.770|http://chocolatey.org/api/v2/package/ScriptCs/0.13.2")
 
   echo ${versions[@]}
 }
