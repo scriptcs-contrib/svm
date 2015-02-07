@@ -139,8 +139,15 @@ function Install-ScriptCsFromNuGetPackage
   $destination = $shellApp.namespace($packageUnzipFolder)
   $destination.CopyHere($zipFile.items(), 0x14) #0x4 = don't show UI, 0x10 = overwrite files
 
-  # Only copy a specific sub folder ( tools\scriptcs\* ) from the .nupkg file into the install folder
-  $zipFolderToExtract = [System.IO.Path]::Combine($packageUnzipFolder, 'tools', 'scriptcs', '*')
+  # Only copy a specific sub folder ( tools\scriptcs\* or tools\* ) from the .nupkg file into the install folder
+  if (Test-Path $([System.IO.Path]::Combine($packageUnzipFolder, 'tools', 'scriptcs')))
+  {
+    $zipFolderToExtract = [System.IO.Path]::Combine($packageUnzipFolder, 'tools', 'scriptcs', '*')
+  }
+  else 
+  {
+    $zipFolderToExtract = [System.IO.Path]::Combine($packageUnzipFolder, 'tools', '*')    
+  }
   Copy-Item -Path $zipFolderToExtract -Recurse -Destination $installPath
 }
 
