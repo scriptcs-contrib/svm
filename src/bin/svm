@@ -110,6 +110,9 @@ _svm_install_scriptcs_from_nugetpackage() {
   local package_zip="${package_path%.nupkg}.zip"
   mv "$package_path" "$package_zip"
   unzip -j "$package_zip" "tools/scriptcs/*" -d "$install_path" > /dev/null 2>&1
+  if ! [ "$(ls -A $install_path)" ]; then 
+    unzip -j "$package_zip" "tools/*" -d "$install_path" > /dev/null 2>&1
+  fi
 }
 
 _svm_install_scriptcs_from_folder() {
