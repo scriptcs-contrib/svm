@@ -8,11 +8,11 @@ svm is a cross platform version manager for [scriptcs](http://scriptcs.net/ "scr
 
 **Install scriptcs version**
 ```
-> svm install 0.12.0
+> svm install 0.13.2
 ```
 **Use scriptcs version**
 ```
-> svm use 0.12.0
+> svm use 0.13.2
 ```
 **List installed scriptcs versions**
 ```
@@ -22,8 +22,9 @@ svm is a cross platform version manager for [scriptcs](http://scriptcs.net/ "scr
 
  The following scriptcs versions are installed:
 
-      0.11.0
-   *  0.12.0
+      0.12.0
+      0.13.0
+   *  0.13.2
       my-dev-build
 ```
 

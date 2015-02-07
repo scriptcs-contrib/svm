@@ -93,6 +93,27 @@ function Get-VersionsAvailableToInstall
   }
   $versions += $version
 
+  $version = New-Object PSObject -Property @{
+    Version               = "0.13.0"
+    PublishedDate         = "2015-01-28T06:24:51.940"
+    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.13.0"
+  }
+  $versions += $version
+
+  $version = New-Object PSObject -Property @{
+    Version               = "0.13.1"
+    PublishedDate         = "2015-02-05T13:05:59.493"
+    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.13.1"
+  }
+  $versions += $version
+
+  $version = New-Object PSObject -Property @{
+    Version               = "0.13.2"
+    PublishedDate         = "2015-02-07T17:07:04.770"
+    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.13.2"
+  }
+  $versions += $version
+
   return $versions
 }
 
