@@ -2,23 +2,28 @@
 
 scriptcs version manager
 
-[![Latest Release](http://img.shields.io/badge/svm-0.3.5-blue.svg?style=flat-square)](https://github.com/scriptcs-contrib/svm/releases/tag/v0.3.5)
+[![Latest Release](http://img.shields.io/badge/svm-0.3.6-blue.svg?style=flat-square)](https://github.com/scriptcs-contrib/svm/releases/tag/v0.3.6)
 
 svm is a cross platform version manager for [scriptcs](http://scriptcs.net/ "scriptcs makes it easy to write and execute C# with a simple text editor.") available on Windows, Mac OS X and Linux. This work and implementation was inspired by [rbenv](https://github.com/sstephenson/rbenv), [rvm](https://github.com/wayneeseguin/rvm), [kvm](https://github.com/aspnet/KRuntime/tree/dev/setup) and [nvm](https://github.com/creationix/nvm).
 
 **Install scriptcs version**
+
 ```
 > svm install 0.13.2
 ```
+
 **Use scriptcs version**
+
 ```
 > svm use 0.13.2
 ```
+
 **List installed scriptcs versions**
+
 ```
 > svm list
 
- scriptcs version manager - 0.3.5
+ scriptcs version manager - 0.3.6
 
  The following scriptcs versions are installed:
 

@@ -56,8 +56,8 @@ _svminstaller_install_package() {
 
 	_svm_info_message "Installing svm to '$install_path'."
 
-	unzip -j "$download_path" "svm-0.3.5/src/bin/*" -d "$install_path/bin" > /dev/null 2>&1
-	unzip -j "$download_path" "svm-0.3.5/src/shims/*" -d "$install_path/shims" > /dev/null 2>&1
+	unzip -j "$download_path" "svm-0.3.6/src/bin/*" -d "$install_path/bin" > /dev/null 2>&1
+	unzip -j "$download_path" "svm-0.3.6/src/shims/*" -d "$install_path/shims" > /dev/null 2>&1
 	mkdir "$install_path/versions"
 
 	# remove Windows specific resources from installed package
@@ -136,7 +136,7 @@ _svminstaller_configure_environment() {
 _svm_title_message "scriptcs version manager - installer"
 
 svm_install_path="$USER_SVM_PATH"
-svm_package_url="https://github.com/scriptcs-contrib/svm/archive/v0.3.5.zip"
+svm_package_url="https://github.com/scriptcs-contrib/svm/archive/v0.3.6.zip"
 svm_download_path="$TEMP_PATH/`uuidgen`/svm-install.zip"
 
 _svminstaller_create_install_location "$svm_install_path"
