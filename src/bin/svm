@@ -95,6 +95,16 @@ _svm_parse_url_from_installversioninfo_record() {
   echo `echo $record | cut -d'|' -f3`
 }
 
+_svm_get_latest_version_available_to_install() {
+    local install_versions=()
+    local sorted=()
+
+    install_versions=($(_svm_get_versions_available_to_install))
+    sorted=($(for version in ${install_versions[@]}; do echo $version; done | sort))
+
+    echo $(_svm_parse_version_from_versionsavailabletoinstall_record ${sorted[${#sorted[@]} - 1]})
+}
+
 _svm_download_scriptcs_nugetpackage() {
   local url="$1"
   local download_path="$2"
@@ -182,11 +192,14 @@ _svm_parse_installedpath_from_installedversions_record() {
 _svm_help() {
   echo "  USAGE: svm <command> [options]"
   echo ""
-  echo "  svm install <version>"
+  echo "  svm install <version|latest>"
   echo "    Install scriptcs version indicated by <version>."
+  echo "    If <latest> is provided, the latest version"
+  echo "    available will be installed."
   echo "    examples:"
   echo "    > svm install 0.11.0"
   echo "    > svm install 0.10.2"
+  echo "    > svm install latest"
   echo ""
   echo "  svm install <version> <-f|-from> <path> [-s|-snapshot]"
   echo "    Install scriptcs version from path <path> as version <version>. Path may be a local folder or a local NuGet"
@@ -244,6 +257,13 @@ _svm_install_version() {
   local install_path=""
 
   version=$(_svm_trim_string "$version")
+  shopt -s nocasematch
+  if [[ $version == "latest" ]]; then
+      _svm_info_message "Finding latest available version to install."
+      version=($(_svm_get_latest_version_available_to_install))
+      _svm_info_message "Latest available version found is '$version'."
+  fi
+  shopt -u nocasematch
   install_path="$VERSIONS_PATH/$version"
 
   if [ ! -d "$install_path" ]; then
@@ -476,7 +496,7 @@ else
       if [[ $# -eq 2 && ( $2 == "-l" || $2 == "-list" ) ]]; then
         _svm_install_list
 
-      # svm install <version>
+      # svm install <version|latest>
       elif [ $# -eq 2 ]; then
         version="$2"
         _svm_install_version "$version"

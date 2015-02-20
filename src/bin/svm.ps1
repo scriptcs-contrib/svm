@@ -128,6 +128,15 @@ function Get-InstallVersionInfo
   return Get-VersionsAvailableToInstall |? { $_.Version -eq $version }
 }
 
+function Get-LatestVersionAvailableToInstall
+{
+    $sorted = @()
+
+    $sorted = Get-VersionsAvailableToInstall | Sort-Object -Property Version -Descending
+
+    return $sorted[0].Version
+}
+
 function Download-ScriptCsNuGetPackage
 {
   param (
@@ -251,11 +260,14 @@ function Svm-Help
 $helpMessage = @"
   USAGE: svm <command> [options]
 
-  svm install <version>
+  svm install <version|latest>
     Install scriptcs version indicated by <version>.
+    If <latest> is provided, the latest version
+    available will be installed
     examples:
     > svm install 0.11.0
     > svm install 0.10.2
+    > svm install latest
 
   svm install <version> <-f|-from> <path> [-s|-snapshot]
     Install scriptcs version from path <path> as version <version>. Path may be a local folder or a local NuGet
@@ -369,6 +381,12 @@ function Svm-InstallVersion
   )
 
   $version = $version.Trim()
+  if ($version.ToLower() -eq "latest")
+  {
+    Write-InfoMessage "Finding latest available version to install."
+    $version = Get-LatestVersionAvailableToInstall
+    Write-InfoMessage "Latest available version found is '$($version)'."
+  }
   $installPath = [System.IO.Path]::Combine($versionsPath, $version)
   if (Test-Path $installPath)
   {
