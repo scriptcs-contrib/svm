@@ -34,12 +34,19 @@ function New-SvmInstallLocation
 
   if (Test-Path $installPath)
   {
-    Write-ErrorMessage "An existing svm installation exists at '$installPath'. Please remove this manually before re-installing."
-    break
+    Write-InfoMessage "An existing svm installation was found at '$installPath'. This will be upgraded."
+    $paths = Get-ChildItem "$installPath" -Exclude ("version", "versions")
+    foreach ($path in $paths)
+    { 
+      if ($path.PSIsContainer -eq $true) { [System.IO.Directory]::Delete($path.FullName, $true) }
+      else { [System.IO.File]::Delete($path.FullName) }
+    }
   }
-
-  Write-InfoMessage "Creating svm install location at '$installPath'."
-  New-Item $installPath -type Directory | Out-Null
+  else 
+  {
+    Write-InfoMessage "Creating svm install location at '$installPath'."
+    New-Item $installPath -type Directory | Out-Null    
+  }
 }
 
 function Download-SvmPackage
@@ -105,9 +112,6 @@ function Configure-Environment
     if (!$foldersToPrependToPath.Contains($path)) { $newPath += $path }
   }
   $path = [String]::Join(';', $newPath)
-
-  # set process path
-  $env:Path = $path
 
   # set user path
   [Environment]::SetEnvironmentVariable("Path", $path, [System.EnvironmentVariableTarget]::User)

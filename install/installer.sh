@@ -27,14 +27,18 @@ _svm_isinstalled() {
 
 _svminstaller_create_install_location() {
 	local install_path="$1"
+	local paths=""
 
 	if [ -d "$install_path" ]; then
-		_svm_error_message "An existing svm installation exists at '$install_path'. Please remove this manually before re-installing."
-		echo "" && exit
+		_svm_info_message "An existing svm installation was found at '$install_path'. This will be upgraded."
+		paths=`find "$install_path" -mindepth 1 -maxdepth 1 \( ! -name "versions" ! -name "version" \)`
+		for path in ${paths[@]}; do
+      if [[ $path == $USER_SVM_PATH* ]]; then rm -fr $path; fi
+    done
+	else
+		_svm_info_message "Creating svm install location at '$install_path'."
+		mkdir "$install_path"	
 	fi
-
-	_svm_info_message "Creating svm install location at '$install_path'."
-	mkdir "$install_path"
 }
 
 _svminstaller_download_package() {
@@ -58,7 +62,7 @@ _svminstaller_install_package() {
 
 	unzip -j "$download_path" "svm-0.3.6/src/bin/*" -d "$install_path/bin" > /dev/null 2>&1
 	unzip -j "$download_path" "svm-0.3.6/src/shims/*" -d "$install_path/shims" > /dev/null 2>&1
-	mkdir "$install_path/versions"
+	mkdir "$install_path/versions" > /dev/null 2>&1
 
 	# remove Windows specific resources from installed package
 	find "$install_path" \( -name "*.cmd" -or -name "*.ps1" \) -exec rm -f {} \;
