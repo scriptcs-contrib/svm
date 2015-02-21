@@ -258,12 +258,11 @@ filter ConvertTo-InstalledVersion
 function Svm-Help
 {
 $helpMessage = @"
-  USAGE: svm <command> [options]
+ USAGE: svm <command> [options]
 
   svm install <version|latest>
-    Install scriptcs version indicated by <version>.
-    If <latest> is provided, the latest version
-    available will be installed
+    Install scriptcs version indicated by <version>. If <latest> is provided, then the latest scriptcs version 
+    available will be installed.
     examples:
     > svm install 0.11.0
     > svm install 0.10.2
