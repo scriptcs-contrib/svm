@@ -270,6 +270,7 @@ _svm_install_version() {
     local nuget_package=""
     local download_path=""
     local nuget_package_path=""
+    local installed_version_count=0
 
     install_version_info=$(_svm_get_installversion_info "$version")
     record_url=$(_svm_parse_url_from_installversioninfo_record "$install_version_info")
@@ -285,7 +286,13 @@ _svm_install_version() {
     # remove download folder - with safety check that path starts with temp folder
     if [[ $download_path == $TEMP_PATH* ]]; then rm -fr $download_path; fi
     _svm_info_message "Version '$version' is now available."
-    _svm_info_message "Consider using svm use <version> to set it as the active scriptcs version."
+
+    installed_version_count=`ls "$VERSIONS_PATH" | wc -l`
+    if [ $installed_version_count -eq 1 ]; then
+      _svm_use_version "$version"
+    else
+      _svm_info_message "Consider using svm use <version> to set it as the active scriptcs version."
+    fi
 
   else
     _svm_error_message "Version '$version' is already installed in versions folder '$VERSIONS_PATH'."

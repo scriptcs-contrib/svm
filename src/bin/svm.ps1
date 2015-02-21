@@ -406,7 +406,14 @@ function Svm-InstallVersion
   Remove-Item -Recurse -Force $downloadPath
 
   Write-InfoMessage "Version '$version' is now available."
-  Write-InfoMessage "Consider using svm use <version> to set it as the active scriptcs version."
+  if ((Get-ChildItem $versionsPath -Directory -ErrorAction SilentlyContinue).Count -eq 1)
+  {
+    Svm-UseVersion $version
+  }
+  else 
+  {
+    Write-InfoMessage "Consider using svm use <version> to set it as the active scriptcs version."    
+  }  
 }
 
 function Svm-RemoveVersion
