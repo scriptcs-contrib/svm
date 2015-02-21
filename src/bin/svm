@@ -100,9 +100,8 @@ _svm_get_latest_version_available_to_install() {
     local sorted=()
 
     install_versions=($(_svm_get_versions_available_to_install))
-    sorted=($(for version in ${install_versions[@]}; do echo $version; done | sort))
-
-    echo $(_svm_parse_version_from_versionsavailabletoinstall_record ${sorted[${#sorted[@]} - 1]})
+    latest=$(for version in ${install_versions[@]}; do echo $(_svm_parse_version_from_versionsavailabletoinstall_record "$version"); done | sort -V -r | head -1)
+    echo $latest
 }
 
 _svm_download_scriptcs_nugetpackage() {
@@ -235,16 +234,16 @@ _svm_help() {
 
 _svm_install_list() {
   local install_versions=()
+  local sorted_versions=()
 
   install_versions=($(_svm_get_versions_available_to_install))
-  if [ ${#install_versions[@]} -gt 0 ]; then
+  sorted_versions=($(for version in ${install_versions[@]}; do echo $(_svm_parse_version_from_versionsavailabletoinstall_record "$version"); done | sort -V -r))
+  if [ ${#sorted_versions[@]} -gt 0 ]; then
     local format_string="  %s\n"
-    local record_version=""
 
     _svm_info_message "The following scriptcs versions are available for installation:\n"
-    for install_version in "${install_versions[@]}"; do
-      record_version=$(_svm_parse_version_from_versionsavailabletoinstall_record "$install_version")
-      printf "$format_string" "$record_version"
+    for install_version in "${sorted_versions[@]}"; do
+      printf "$format_string" "$install_version"
     done
   else
     _svm_info_message "No scriptcs versions could be found to install."

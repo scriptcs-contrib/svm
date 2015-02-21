@@ -132,7 +132,7 @@ function Get-LatestVersionAvailableToInstall
 {
     $sorted = @()
 
-    $sorted = Get-VersionsAvailableToInstall | Sort-Object -Property Version -Descending
+    $sorted = Get-VersionsAvailableToInstall | Sort-Object -Property PublishedDate -Descending
 
     return $sorted[0].Version
 }
