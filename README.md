@@ -41,4 +41,6 @@ svm is a cross platform version manager for [scriptcs](http://scriptcs.net/ "scr
 
 ## Where can I get it ?
 
+[![Join the chat at https://gitter.im/scriptcs-contrib/svm](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/scriptcs-contrib/svm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Check out the options for [Installing svm](https://github.com/scriptcs-contrib/svm/wiki/Installing-svm) on the [svm wiki](https://github.com/scriptcs-contrib/svm/wiki).
