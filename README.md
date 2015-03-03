@@ -2,7 +2,7 @@
 
 scriptcs version manager
 
-[![Latest Release](http://img.shields.io/badge/svm-0.3.7-blue.svg?style=flat-square)](https://github.com/scriptcs-contrib/svm/releases/tag/v0.3.7)
+[![Latest Release](http://img.shields.io/badge/svm-0.3.7-blue.svg?style=flat-square)](https://github.com/scriptcs-contrib/svm/releases/tag/v0.3.7) [![Join the chat at https://gitter.im/scriptcs-contrib/svm](https://img.shields.io/badge/gitter-join%20chat%20%E2%86%92-brightgreen.svg?style=flat-square)](https://gitter.im/scriptcs-contrib/svm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 svm is a cross platform version manager for [scriptcs](http://scriptcs.net/ "scriptcs makes it easy to write and execute C# with a simple text editor.") available on Windows, Mac OS X and Linux. This work and implementation was inspired by [rbenv](https://github.com/sstephenson/rbenv), [rvm](https://github.com/wayneeseguin/rvm), [kvm](https://github.com/aspnet/KRuntime/tree/dev/setup) and [nvm](https://github.com/creationix/nvm).
 
@@ -40,7 +40,5 @@ svm is a cross platform version manager for [scriptcs](http://scriptcs.net/ "scr
 ```
 
 ## Where can I get it ?
-
-[![Join the chat at https://gitter.im/scriptcs-contrib/svm](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/scriptcs-contrib/svm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Check out the options for [Installing svm](https://github.com/scriptcs-contrib/svm/wiki/Installing-svm) on the [svm wiki](https://github.com/scriptcs-contrib/svm/wiki).
