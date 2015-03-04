@@ -435,7 +435,15 @@ function Svm-RemoveVersion
 
   if ($versionToRemove)
   {
-    Remove-Item $versionToRemove.Location -Force -Recurse -ErrorAction SilentlyContinue
+    $attributes = [System.IO.File]::GetAttributes($versionToRemove.Location)
+    if (($attributes -band [System.IO.FileAttributes]::ReparsePoint) -eq "ReparsePoint")
+    {
+      [System.IO.Directory]::Delete($versionToRemove.Location, $false)
+    }
+    else 
+    {
+      Remove-Item $versionToRemove.Location -Force -Recurse -ErrorAction SilentlyContinue 
+    }
     Write-InfoMessage "The scriptcs version '$($version)' has been removed from versions folder '$($versionsPath)'."
 
     $newActiveVersion = $versions |? { $_.Version -ne $version } | select -First 1
