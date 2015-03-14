@@ -101,7 +101,7 @@ _svm_get_latest_version_available_to_install() {
     local sorted=()
 
     install_versions=($(_svm_get_versions_available_to_install))
-    latest=$(for version in ${install_versions[@]}; do echo $(_svm_parse_version_from_versionsavailabletoinstall_record "$version"); done | sort -V -r | head -1)
+    latest=$(for version in ${install_versions[@]}; do echo $(_svm_parse_version_from_versionsavailabletoinstall_record "$version"); done | sed 's/^[0-9]\./0&/; s/\.\([0-9]\)$/.0\1/; s/\.\([0-9]\)\./.0\1./g;' | sort -r | sed 's/^0// ; s/\.0/./g' | head -1)
     echo $latest
 }
 
@@ -161,7 +161,7 @@ _svm_get_installed_versions() {
   if [ -d "$VERSIONS_PATH" ]; then
     active_version=$(_svm_get_active_version)
 
-    local installed_versions=(`ls "$VERSIONS_PATH"`)
+    local installed_versions=(`ls "$VERSIONS_PATH" | sed 's/^[0-9]\./0&/; s/\.\([0-9]\)$/.0\1/; s/\.\([0-9]\)\./.0\1./g;' | sort -r | sed 's/^0// ; s/\.0/./g'`)
     for installed_version in ${installed_versions[@]}; do
       [[ "$active_version" == "$installed_version" ]] && active="true" || active="false"
       # Format: Active|Version|InstalledPath
@@ -237,7 +237,7 @@ _svm_install_list() {
   local sorted_versions=()
 
   install_versions=($(_svm_get_versions_available_to_install))
-  sorted_versions=($(for version in ${install_versions[@]}; do echo $(_svm_parse_version_from_versionsavailabletoinstall_record "$version"); done | sort -V -r))
+  sorted_versions=($(for version in ${install_versions[@]}; do echo $(_svm_parse_version_from_versionsavailabletoinstall_record "$version"); done | sed 's/^[0-9]\./0&/; s/\.\([0-9]\)$/.0\1/; s/\.\([0-9]\)\./.0\1./g;' | sort -r | sed 's/^0// ; s/\.0/./g'))
   if [ ${#sorted_versions[@]} -gt 0 ]; then
     local format_string="  %s\n"
 
