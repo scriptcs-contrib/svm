@@ -236,7 +236,7 @@ function Get-InstalledVersions
   }
 
   $activeVersion = Get-ActiveVersion
-  $versions = Get-ChildItem $versionsPath | ConvertTo-InstalledVersion $activeVersion
+  $versions = Get-ChildItem $versionsPath | ConvertTo-InstalledVersion $activeVersion | Sort-Object -Property Version -Descending
   return $versions
 }
 
