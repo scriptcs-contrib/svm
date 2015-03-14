@@ -184,6 +184,12 @@ _svm_parse_installedpath_from_installedversions_record() {
   echo `echo $record | cut -d'|' -f3`
 }
 
+_svm_get_symlink_target() {
+  local source_path="$1"
+
+  # "readlink -f" is not available on OSX - but don't think it is required in this case anyway
+  find "$source_path" -type l -exec readlink {} \;
+}
 
 #
 # svm commands
@@ -403,10 +409,10 @@ _svm_list() {
 
   installed_versions=($(_svm_get_installed_versions))
   if [ ${#installed_versions[@]} -gt 0 ]; then
-    local format_string="  %1s  %s\n"
     local active=""
     local record_active=""
     local record_version=""
+    local record_target=""
 
     _svm_info_message "The following scriptcs versions are installed:\n"
     for installed_version in "${installed_versions[@]}"; do
@@ -414,7 +420,14 @@ _svm_list() {
       record_active=$(_svm_parse_active_from_installedversions_record "$installed_version")
       [[ "$record_active" == "true" ]] && active="*" || active=" "
       record_version=$(_svm_parse_version_from_installedversions_record "$installed_version")
-      printf "$format_string" "$active" "$record_version"
+      record_target=$(_svm_get_symlink_target $(_svm_parse_installedpath_from_installedversions_record "$installed_version"))
+
+      if [[ $record_target == "" ]]; then
+        printf "  %1s  %s\n" "$active" "$record_version"
+      else
+        printf "  %1s  %-10s [ %s ]\n" "$active" "$record_version" "$record_target"
+      fi
+      
     done
   else
     _svm_info_message "No scriptcs versions found."
@@ -426,12 +439,14 @@ _svm_list_active() {
   local installed_versions=()
   local record_active=""
   local record_version=""
+  local record_target=""
 
   installed_versions=($(_svm_get_installed_versions))
   for installed_version in "${installed_versions[@]}"; do
     record_active=$(_svm_parse_active_from_installedversions_record "$installed_version")
     if [ "$record_active" == "true" ]; then
       record_version=$(_svm_parse_version_from_installedversions_record "$installed_version")
+      record_target=$(_svm_get_symlink_target $(_svm_parse_installedpath_from_installedversions_record "$installed_version"))
     fi
   done
 
@@ -445,8 +460,11 @@ _svm_list_active() {
 
   else
     _svm_info_message "The following is the active scriptcs version:\n"
-    _svm_info_message "  $record_version"
-
+    if [[ $record_target == "" ]]; then
+      _svm_info_message "  $record_version"
+    else
+      printf "  %-10s [ %s ]\n" "$record_version" "$record_target"
+    fi
   fi
 }
 
