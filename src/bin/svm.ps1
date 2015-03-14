@@ -26,7 +26,9 @@ function Write-TitleMessage
   param (
     [string] $message
   )
-  Write-Host  $("{0}" -f "`n $message `n") -BackgroundColor DarkGray -ForegroundColor Black
+  Write-Host
+  Write-Host  $("{0}" -f " $message ") -BackgroundColor DarkGray -ForegroundColor Black
+  Write-Host
 }
 function Write-InfoMessage
 {
@@ -204,8 +206,7 @@ function Install-ScriptCsFromFolder
   }
   else
   {
-    $command = "cmd /c mklink /J"
-    invoke-expression "$command '$installPath' '$sourcePath'" | Out-Null
+    New-Junction "$sourcePath" "$installPath"
   }
 }
 
@@ -257,6 +258,38 @@ filter ConvertTo-InstalledVersion
     Location = $_.FullName
   }
   return $version
+}
+
+function New-Junction
+{
+  param(
+    [string] $sourcePath,
+    [string] $targetPath
+  )
+
+  $command = "cmd /c mklink /J"
+  Invoke-Expression "$command '$targetPath' '$sourcePath'" | Out-Null
+}
+
+function Get-JunctionTarget
+{
+  param(
+    [string] $sourcePath
+  )
+
+  $item = Get-Item "$sourcePath"
+  $command = 'cmd /c dir /A:L "' + $item.Parent.FullName + '"'
+  Invoke-Expression "$command" |? { $_ -match "${$item.BaseName}\[(.+)\]"} | Out-Null
+  return $matches[1]
+}
+
+function Remove-Junction
+{
+  param(
+    [string] $sourcePath
+  )
+
+  [System.IO.Directory]::Delete($sourcePath, $false)
 }
 
 #
@@ -436,9 +469,9 @@ function Svm-RemoveVersion
   if ($versionToRemove)
   {
     $attributes = [System.IO.File]::GetAttributes($versionToRemove.Location)
-    if (($attributes -band [System.IO.FileAttributes]::ReparsePoint) -eq "ReparsePoint")
+    if (($attributes -band [System.IO.FileAttributes]::ReparsePoint) -eq [System.IO.FileAttributes]::ReparsePoint)
     {
-      [System.IO.Directory]::Delete($versionToRemove.Location, $false)
+      Remove-Junction $versionToRemove.Location
     }
     else 
     {
@@ -481,7 +514,16 @@ function Svm-ListActive
   else
   {
     Write-InfoMessage "The following is the active scriptcs version:`n"
-    Write-InfoMessage $("  {0}" -f $activeVersion.Version)
+
+    $attributes = [System.IO.File]::GetAttributes($activeVersion.Location)
+    if (($attributes -band [System.IO.FileAttributes]::ReparsePoint) -eq [System.IO.FileAttributes]::ReparsePoint)
+    {
+      Write-InfoMessage $("  {0,-10} [ {1} ]" -f $activeVersion.Version, $(Get-JunctionTarget($activeVersion.Location)))
+    }
+    else 
+    {
+      Write-InfoMessage $("  {0}" -f $activeVersion.Version)
+    }    
   }
 }
 
@@ -498,7 +540,16 @@ function Svm-List
   {
     Write-InfoMessage "The following scriptcs versions are installed:`n"
     $versions |% {
-      Write-InfoMessage $("  {0,1}  {1}" -f $(if ($_.Active) { "*" } else { " " }), $_.Version)
+      $attributes = [System.IO.File]::GetAttributes($_.Location)
+      if (($attributes -band [System.IO.FileAttributes]::ReparsePoint) -eq [System.IO.FileAttributes]::ReparsePoint)
+      {
+        Write-InfoMessage $("  {0,1}  {1,-10} [ {2} ]" -f $(if ($_.Active) { "*" } else { " " }), $_.Version, $(Get-JunctionTarget($_.Location)))    
+      }
+      else 
+      {
+        Write-InfoMessage $("  {0,1}  {1}" -f $(if ($_.Active) { "*" } else { " " }), $_.Version)    
+      }
+      
     }
   }
 }
