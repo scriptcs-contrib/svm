@@ -1,7 +1,13 @@
 <?xml version="1.0"?>
 <svm>
-  <!--<message></message>-->
+  <!-- <message></message> -->
+  <!-- <redirectURL></redirectURL> -->
   <releases>
+    <item>
+      <version>0.14.0</version>
+      <publishedDate>2015-03-23T16:54:33.567</publishedDate>
+      <downloadURL>http://chocolatey.org/api/v2/package/ScriptCs/0.14.0</downloadURL>
+    </item>
     <item>
       <version>0.13.3</version>
       <publishedDate>2015-02-24T07:21:37.810</publishedDate>
