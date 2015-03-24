@@ -295,7 +295,7 @@ $helpMessage = @"
       > svm install 0.11.0 -from 'C:\Downloads\ScriptCs.0.11.0.nupkg'
 
   svm install <-l|-list>
-    List the scriptcs versions avaiable to install.
+    List the scriptcs versions available to install.
     examples:
     > svm install -l
 
