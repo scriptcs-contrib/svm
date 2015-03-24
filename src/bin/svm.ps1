@@ -10,7 +10,7 @@ param (
 )
 
 #$svmVersion = "{{VERSION}}"
-$svmVersion = "0.3.8"
+$svmVersion = "0.4.0"
 
 $scriptPath       = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition)  # \.svm\bin
 $svmPath          = [System.IO.Directory]::GetParent($scriptPath).FullName                  # \.svm\

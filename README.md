@@ -2,7 +2,7 @@
 
 scriptcs version manager
 
-[![Latest Release](http://img.shields.io/badge/svm-0.3.8-blue.svg?style=flat-square)](https://github.com/scriptcs-contrib/svm/releases/tag/v0.3.8) [![Join the chat at https://gitter.im/scriptcs-contrib/svm](https://img.shields.io/badge/gitter-join%20chat%20%E2%86%92-brightgreen.svg?style=flat-square)](https://gitter.im/scriptcs-contrib/svm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Latest Release](http://img.shields.io/badge/svm-0.4.0-blue.svg?style=flat-square)](https://github.com/scriptcs-contrib/svm/releases/tag/v0.4.0) [![Join the chat at https://gitter.im/scriptcs-contrib/svm](https://img.shields.io/badge/gitter-join%20chat%20%E2%86%92-brightgreen.svg?style=flat-square)](https://gitter.im/scriptcs-contrib/svm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 svm is a cross platform version manager for [scriptcs](http://scriptcs.net/ "scriptcs makes it easy to write and execute C# with a simple text editor.") available on Windows, Mac OS X and Linux. This work and implementation was inspired by [rbenv](https://github.com/sstephenson/rbenv), [rvm](https://github.com/wayneeseguin/rvm), [kvm](https://github.com/aspnet/KRuntime/tree/dev/setup) and [nvm](https://github.com/creationix/nvm).
 
@@ -15,13 +15,13 @@ svm is a cross platform version manager for [scriptcs](http://scriptcs.net/ "scr
 **Install specific scriptcs version**
 
 ```
-> svm install 0.13.3
+> svm install 0.14.0
 ```
 
 **Set active scriptcs version**
 
 ```
-> svm use 0.13.3
+> svm use 0.14.0
 ```
 
 **List installed scriptcs versions**
@@ -29,12 +29,13 @@ svm is a cross platform version manager for [scriptcs](http://scriptcs.net/ "scr
 ```
 > svm list
 
- scriptcs version manager - 0.3.8
+ scriptcs version manager - 0.4.0
 
  The following scriptcs versions are installed:
 
       my-dev-build    [ C:\Dev\scriptcs\Release\bin ]
-   *  0.13.3
+   *  0.14.0
+      0.13.3
       0.13.2
 ```
 
