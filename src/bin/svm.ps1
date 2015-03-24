@@ -54,74 +54,52 @@ function String-IsEmptyOrWhitespace
   return [string]::IsNullOrEmpty($str) -or $str.Trim().length -eq 0
 }
 
+function Download-VersionList
+{
+  param (
+    [string] $url
+  )
+
+  try 
+  {
+    $wc = New-Object System.Net.WebClient
+    return $wc.DownloadString($url)
+  }
+  catch 
+  {
+    throw [System.Exception] ("The version list could not be retrieved from '$url'.`n " + $_.Exception.Message)
+  }
+}
+
+
 function Get-VersionsAvailableToInstall
 {
-  # TODO replace with call to svm web api (include release and nightly versions) ...
-
   $versions = @();
+  
+  $url = "https://raw.githubusercontent.com/scriptcs-contrib/svm/master/api/svm-releases.xml"
+  [xml]$xml = Download-VersionList $url
 
-  $version = New-Object PSObject -Property @{
-    Version               = "0.10.0"
-    PublishedDate         = "2014-07-30T02:22:35.907"
-    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.10.0"
+  $message = $xml.svm.message
+  if ($message -ne $null)
+  {
+    Write-ErrorMessage $message
+    Write-InfoMessage
   }
-  $versions += $version
 
-  $version = New-Object PSObject -Property @{
-    Version               = "0.10.1"
-    PublishedDate         = "2014-07-30T22:24:13.010"
-    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.10.1"
+  $redirectURL = $xml.svm.redirectURL
+  if ($redirectURL -ne $null)
+  {
+    [xml]$xml = Download-VersionList $redirectURL
   }
-  $versions += $version
 
-  $version = New-Object PSObject -Property @{
-    Version               = "0.10.2"
-    PublishedDate         = "2014-08-01T02:41:53.897"
-    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.10.2"
+  $xml.svm.releases.item |% {
+    $version = New-Object PSObject -Property @{
+      Version               = $_.version
+      PublishedDate         = $_.publishedDate
+      URL                   = $_.downloadURL
+    }
+    $versions += $version
   }
-  $versions += $version
-
-  $version = New-Object PSObject -Property @{
-    Version               = "0.11.0"
-    PublishedDate         = "2014-12-11T01:36:47.487"
-    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.11.0"
-  }
-  $versions += $version
-
-  $version = New-Object PSObject -Property @{
-    Version               = "0.12.0"
-    PublishedDate         = "2014-12-24T19:47:22.007"
-    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.12.0"
-  }
-  $versions += $version
-
-  $version = New-Object PSObject -Property @{
-    Version               = "0.13.0"
-    PublishedDate         = "2015-01-28T06:24:51.940"
-    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.13.0"
-  }
-  $versions += $version
-
-  $version = New-Object PSObject -Property @{
-    Version               = "0.13.1"
-    PublishedDate         = "2015-02-05T13:05:59.493"
-    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.13.1"
-  }
-  $versions += $version
-
-  $version = New-Object PSObject -Property @{
-    Version               = "0.13.2"
-    PublishedDate         = "2015-02-07T17:07:04.770"
-    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.13.2"
-  }
-  $versions += $version
-
-  $version = New-Object PSObject -Property @{
-    Version               = "0.13.3"
-    PublishedDate         = "2015-02-24T07:21:37.810"
-    URL                   = "http://chocolatey.org/api/v2/package/ScriptCs/0.13.3"
-  }
-  $versions += $version
 
   return $versions
 }
@@ -133,7 +111,6 @@ function Get-InstallVersionInfo
     [string] $version
   )
 
-  # TODO replace with call to svm web api
   return Get-VersionsAvailableToInstall |? { $_.Version -eq $version }
 }
 
@@ -315,7 +292,7 @@ $helpMessage = @"
       examples:
       > svm install mybuild-0.11.0 -f 'C:\scriptcs\artifacts\Release\bin'
       > svm install mybuild-0.11.0 -from 'C:\scriptcs\artifacts\Release\bin' -snapshot
-      > svm install 0.11.0 -from 'C:\Downloads\ScriptCs.0.10.1.nupkg'
+      > svm install 0.11.0 -from 'C:\Downloads\ScriptCs.0.11.0.nupkg'
 
   svm install <-l|-list>
     List the scriptcs versions avaiable to install.
