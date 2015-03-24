@@ -33,21 +33,44 @@ _svm_trim_string() {
   echo $string
 }
 
+_svm_download_versionlist() {
+  local url="$1"
+
+  local download_path="$TEMP_PATH/`uuidgen`"
+  local httpResult=$(curl -D - -L --create-dirs -o "$download_path" "$url" 2>/dev/null | grep "^HTTP/1.1" | tail -n 1 | sed "s/HTTP.1.1 \([0-9]*\).*/\1/")
+  if [ $httpResult != "200" ];then
+    _svm_error_message "The version list could not be retrieved from '$url'."
+    echo "" && exit
+  fi
+
+  cat $download_path
+  rm $download_path
+}
+
 _svm_get_versions_available_to_install() {
   local versions=()
 
-  # TODO replace with call to svm web api (include release and nightly versions) ...
+  local url="https://raw.githubusercontent.com/scriptcs-contrib/svm/master/api/svm-releases.xml"
+  local xml=$(_svm_download_versionlist "$url")
 
-  # Format: Version|PublishedDate|URL
-  versions+=("0.10.0|2014-07-30T02:22:35.907|http://chocolatey.org/api/v2/package/ScriptCs/0.10.0")
-  versions+=("0.10.1|2014-07-30T22:24:13.010|http://chocolatey.org/api/v2/package/ScriptCs/0.10.1")
-  versions+=("0.10.2|2014-08-01T02:41:53.897|http://chocolatey.org/api/v2/package/ScriptCs/0.10.2")
-  versions+=("0.11.0|2014-12-11T01:36:47.487|http://chocolatey.org/api/v2/package/ScriptCs/0.11.0")
-  versions+=("0.12.0|2014-12-24T19:47:22.007|http://chocolatey.org/api/v2/package/ScriptCs/0.12.0")
-  versions+=("0.13.0|2015-01-28T06:24:51.940|http://chocolatey.org/api/v2/package/ScriptCs/0.13.0")
-  versions+=("0.13.1|2015-02-05T13:05:59.493|http://chocolatey.org/api/v2/package/ScriptCs/0.13.1")
-  versions+=("0.13.2|2015-02-07T17:07:04.770|http://chocolatey.org/api/v2/package/ScriptCs/0.13.2")
-  versions+=("0.13.3|2015-02-24T07:21:37.810|http://chocolatey.org/api/v2/package/ScriptCs/0.13.3")
+  local message=`echo $xml | xmllint --xpath '/svm/message/text()' - 2>/dev/null`
+  if [[ $message != "" ]]; then 
+    echo -e "\033[41m $message \033[0m" >&2
+    echo >&2 
+  fi
+
+  local redirectURL=`echo $xml | xmllint --xpath '/svm/redirectURL/text()' - 2>/dev/null`
+  if [[ $redirectURL != "" ]]; then 
+    local xml=$(_svm_download_versionlist "$redirectURL")
+  fi
+
+  local nodecount=`echo $xml | xmllint --xpath 'count(/svm/releases/item)' - 2>/dev/null`
+  if [[ $nodecount == "" ]]; then nodecount=0; fi
+  for i in `seq $nodecount`; do
+    # Format: Version|PublishedDate|URL
+    local xpath="concat(/svm/releases/item[$i]/version/text(),\"|\",/svm/releases/item[$i]/publishedDate/text(),\"|\",/svm/releases/item[$i]/downloadURL/text())"
+    versions+=(`echo $xml | xmllint --xpath $xpath - 2>/dev/null`)
+  done  
 
   echo ${versions[@]}
 }
@@ -67,8 +90,6 @@ _svm_parse_url_from_versionsavailabletoinstall_record() {
 _svm_get_installversion_info() {
   local version="$1"
   local version_info=""
-
-  # TODO replace with call to svm web api
 
   install_versions=($(_svm_get_versions_available_to_install))
   if [ ${#install_versions[@]} -gt 0 ]; then
@@ -213,7 +234,7 @@ _svm_help() {
   echo "    examples:"
   echo "    > svm install mybuild-0.11.0 -f '/tmp/scriptcs/artifacts/Release/bin'"
   echo "    > svm install mybuild-0.11.0 -from '/tmp/scriptcs/artifacts/Release/bin' -snapshot"
-  echo "    > svm install 0.11.0 -from '/tmp/downloads/ScriptCs.0.10.2.nupkg'"
+  echo "    > svm install 0.11.0 -from '/tmp/downloads/ScriptCs.0.11.0.nupkg'"
   echo ""
   echo "  svm install <-l|-list>"
   echo "    List the scriptcs versions avaiable to install."
