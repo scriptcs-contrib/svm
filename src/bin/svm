@@ -237,7 +237,7 @@ _svm_help() {
   echo "    > svm install 0.11.0 -from '/tmp/downloads/ScriptCs.0.11.0.nupkg'"
   echo ""
   echo "  svm install <-l|-list>"
-  echo "    List the scriptcs versions avaiable to install."
+  echo "    List the scriptcs versions available to install."
   echo "    examples:"
   echo "    > svm install -l"
   echo ""
