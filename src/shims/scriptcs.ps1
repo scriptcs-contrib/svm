@@ -60,25 +60,29 @@ function Get-ScriptCsExecutable
 # shim
 #
 
+$EXITCODE_ERROR = 1
+
 try
 {
   $version = Get-ActiveVersion
   if (String-IsEmptyOrWhitespace($version))
   {
     Write-ErrorMessage "No active scriptcs found. Use 'svm use <version>' to set the active scriptcs version."
-    exit
+    exit $EXITCODE_ERROR
   }
 
   $scriptcs = Get-ScriptCsExecutable $version
   if (!(Test-Path $scriptcs))
   {
     Write-ErrorMessage "The active scriptcs could not be found at '$scriptcs'. Use 'svm use <version>' to correctly set the active scriptcs version."
-    exit
+    exit $EXITCODE_ERROR
   }
 
   &$scriptcs $args
+  exit $LASTEXITCODE
 }
 catch
 {
   Write-ErrorMessage $_
+  exit $EXITCODE_ERROR
 }
