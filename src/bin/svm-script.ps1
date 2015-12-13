@@ -256,7 +256,7 @@ function Get-JunctionTarget
 
   $item = Get-Item "$sourcePath"
   $command = 'cmd /c dir /A:L "' + $item.Parent.FullName + '"'
-  Invoke-Expression "$command" |? { $_ -match "${$item.BaseName}\[(.+)\]"} | Out-Null
+  Invoke-Expression "$command" |? { $_ -match "$($item.BaseName) \[(.+)\]"} | Out-Null
   return $matches[1]
 }
 
