@@ -26,6 +26,14 @@ function Write-ErrorMessage
   Write-Host $("{0}" -f " $message ") -BackgroundColor DarkRed -ForegroundColor White
 }
 
+function String-IsEmptyOrWhitespace
+{
+  param (
+    [string] $str
+  )
+  return [string]::IsNullOrEmpty($str) -or $str.Trim().length -eq 0
+}
+
 function New-SvmInstallLocation
 {
   param (
@@ -105,14 +113,17 @@ function Configure-Environment
   $foldersToPrependToPath = @()
   $foldersToPrependToPath += [System.IO.Path]::Combine($installPath, 'bin')
   $foldersToPrependToPath += [System.IO.Path]::Combine($installPath, 'shims')
-
   $newPath = ($foldersToPrependToPath)
-  foreach($path in $envPath.Split(';'))
+  
+  if (!$(String-IsEmptyOrWhitespace( $envPath )))
   {
-    if (!$foldersToPrependToPath.Contains($path)) { $newPath += $path }
+    foreach($path in $envPath.Split(';'))
+    {
+      if (!$foldersToPrependToPath.Contains($path)) { $newPath += $path }
+    }
   }
   $path = [String]::Join(';', $newPath)
-
+  
   # set user path
   [Environment]::SetEnvironmentVariable("Path", $path, [System.EnvironmentVariableTarget]::User)
 }
