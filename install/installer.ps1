@@ -90,10 +90,10 @@ function Install-SvmPackage
   $destination.CopyHere($zipFile.items(), 0x14) #0x4 = don't show UI, 0x10 = overwrite files
 
   # Only copy Windows specific contents into the install folder
-  $zipFolderToExtract = [System.IO.Path]::Combine($unzipFolder, 'svm-0.4.1', 'src', 'bin')
+  $zipFolderToExtract = [System.IO.Path]::Combine($unzipFolder, 'svm-0.4.2', 'src', 'bin')
   Remove-Item -Path $([System.IO.Path]::Combine($zipFolderToExtract, 'svm'))
   Copy-Item -Path $zipFolderToExtract -Recurse -Destination $installPath
-  $zipFolderToExtract = [System.IO.Path]::Combine($unzipFolder, 'svm-0.4.1', 'src', 'shims')
+  $zipFolderToExtract = [System.IO.Path]::Combine($unzipFolder, 'svm-0.4.2', 'src', 'shims')
   Remove-Item -Path $([System.IO.Path]::Combine($zipFolderToExtract, 'scriptcs'))
   Copy-Item -Path $zipFolderToExtract -Recurse -Destination $installPath
 
@@ -134,7 +134,7 @@ function Configure-Environment
 Write-TitleMessage "scriptcs version manager - installer"
 
 $installPath  = $userSvmPath
-$url          = "https://github.com/scriptcs-contrib/svm/archive/v0.4.1.zip"
+$url          = "https://github.com/scriptcs-contrib/svm/archive/v0.4.2.zip"
 $downloadPath = [System.IO.Path]::Combine($env:TEMP, [Guid]::NewGuid(), 'svm-install.zip')
 
 New-SvmInstallLocation $installPath
