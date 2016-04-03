@@ -4,6 +4,11 @@
   <!-- <redirectURL></redirectURL> -->
   <releases>
     <item>
+      <version>0.16.0</version>
+      <publishedDate>2016-04-02T14:48:35Z</publishedDate>
+      <downloadURL>http://chocolatey.org/api/v2/package/ScriptCs/0.16.0</downloadURL>
+    </item>
+    <item>
       <version>0.15.0</version>
       <publishedDate>2015-08-03T16:55:00.57</publishedDate>
       <downloadURL>http://chocolatey.org/api/v2/package/ScriptCs/0.15.0</downloadURL>
