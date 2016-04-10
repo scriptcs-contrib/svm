@@ -4,6 +4,11 @@
   <!-- <redirectURL></redirectURL> -->
   <releases>
     <item>
+      <version>0.16.1</version>
+      <publishedDate>2016-04-07T00:28:51.05</publishedDate>
+      <downloadURL>http://chocolatey.org/api/v2/package/ScriptCs/0.16.1</downloadURL>
+    </item>
+    <item>
       <version>0.16.0</version>
       <publishedDate>2016-04-02T14:48:35Z</publishedDate>
       <downloadURL>http://chocolatey.org/api/v2/package/ScriptCs/0.16.0</downloadURL>
@@ -22,51 +27,6 @@
       <version>0.14.0</version>
       <publishedDate>2015-03-23T16:54:33.567</publishedDate>
       <downloadURL>http://chocolatey.org/api/v2/package/ScriptCs/0.14.0</downloadURL>
-    </item>
-    <item>
-      <version>0.13.3</version>
-      <publishedDate>2015-02-24T07:21:37.810</publishedDate>
-      <downloadURL>http://chocolatey.org/api/v2/package/ScriptCs/0.13.3</downloadURL>
-    </item>
-    <item>
-      <version>0.13.2</version>
-      <publishedDate>2015-02-07T17:07:04.770</publishedDate>
-      <downloadURL>http://chocolatey.org/api/v2/package/ScriptCs/0.13.2</downloadURL>
-    </item>
-    <item>
-      <version>0.13.1</version>
-      <publishedDate>2015-02-05T13:05:59.493</publishedDate>
-      <downloadURL>http://chocolatey.org/api/v2/package/ScriptCs/0.13.1</downloadURL>
-    </item>
-    <item>
-      <version>0.13.0</version>
-      <publishedDate>2015-01-28T06:24:51.940</publishedDate>
-      <downloadURL>http://chocolatey.org/api/v2/package/ScriptCs/0.13.0</downloadURL>
-    </item>
-    <item>
-      <version>0.12.0</version>
-      <publishedDate>2014-12-24T19:47:22.007</publishedDate>
-      <downloadURL>http://chocolatey.org/api/v2/package/ScriptCs/0.12.0</downloadURL>
-    </item>
-    <item>
-      <version>0.11.0</version>
-      <publishedDate>2014-12-11T01:36:47.487</publishedDate>
-      <downloadURL>http://chocolatey.org/api/v2/package/ScriptCs/0.11.0</downloadURL>
-    </item>
-    <item>
-      <version>0.10.2</version>
-      <publishedDate>2014-08-01T02:41:53.897</publishedDate>
-      <downloadURL>http://chocolatey.org/api/v2/package/ScriptCs/0.10.2</downloadURL>
-    </item>
-    <item>
-      <version>0.10.1</version>
-      <publishedDate>2014-07-30T22:24:13.010</publishedDate>
-      <downloadURL>http://chocolatey.org/api/v2/package/ScriptCs/0.10.1</downloadURL>
-    </item>
-    <item>
-      <version>0.10.0</version>
-      <publishedDate>2014-07-30T02:22:35.907</publishedDate>
-      <downloadURL>http://chocolatey.org/api/v2/package/ScriptCs/0.10.0</downloadURL>
     </item>
   </releases>
 </svm>
