@@ -65,8 +65,9 @@ function Download-SvmPackage
   )
 
   Write-InfoMessage "Downloading svm install package from '$url'."
-
   New-Item $([System.IO.Path]::GetDirectoryName($downloadPath)) -type Directory | Out-Null
+
+  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
   $wc = New-Object System.Net.WebClient
   $wc.DownloadFile($url, $downloadPath)
 }
