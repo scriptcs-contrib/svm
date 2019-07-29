@@ -1,3 +1,9 @@
+> THIS REPO IS NO LONGER ACTIVELY MAINTAINED
+>
+> IF YOU ARE STILL ACTIVELY USING SVM AND WOULD LIKE TO MAINTAIN IT, THEN PLEASE FOLLOW UP IN [ISSUE #88](https://github.com/scriptcs-contrib/svm/issues/88).
+> 
+> [I](https://github.com/paulbouwer) will be archiving this repo after 1 Oct 2019.
+
 ![svm](https://raw.githubusercontent.com/scriptcs-contrib/svm/master/assets/logo.png)
 
 scriptcs version manager
